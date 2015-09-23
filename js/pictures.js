@@ -3,4 +3,14 @@
  */
 (function(){
 
+    var filtersForm = document.querySelector('.filters');
+    filtersForm.classList.add('hidden');
+
+    var picturesContainer = document.querySelector('.pictures');
+
+
+    pictures.forEach(function (picture, i){
+
+    })
+
 })();
