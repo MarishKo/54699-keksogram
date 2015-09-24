@@ -33,7 +33,6 @@
         if (picture['url']) {
 
             var pictureBackground = new Image();
-            pictureBackground.src = picture['url'];
 
             var imageLoadTimeout = setTimeout(function() {
                 newPictureElement.classList.add('picture-load-failure');
@@ -45,6 +44,8 @@
                 pictureBackground.height = '182';
                 clearTimeout(imageLoadTimeout);
             }
+
+            pictureBackground.src = picture['url'];
 
             pictureBackground.onerror = function(evt) {
                 newPictureElement.classList.add('picture-load-failure');
