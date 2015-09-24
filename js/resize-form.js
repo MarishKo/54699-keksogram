@@ -21,5 +21,7 @@
 
     resizeForm.classList.add('invisible');
     filterForm.classList.remove('invisible');
+
   };
+
 })();
