@@ -1,89 +1,90 @@
 ﻿(function() {
-	var uploadForm = document.forms['upload-select-image'];
-	var resizeForm = document.forms['upload-resize'];
-	var filterForm = document.forms['upload-filter'];
+  var uploadForm = document.forms['upload-select-image'];
+  var resizeForm = document.forms['upload-resize'];
+  var filterForm = document.forms['upload-filter'];
 
-	var previewImage = resizeForm.querySelector('.resize-image-preview');
-	var prevButton = resizeForm['resize-prev'];
+  var previewImage = resizeForm.querySelector('.resize-image-preview');
+  var prevButton = resizeForm['resize-prev'];
 
-	var resizeX = resizeForm['resize-x'];
-	var resizeY = resizeForm['resize-y'];
-	var resizeSize = resizeForm['resize-size'];
+  var resizeX = resizeForm['resize-x'];
+  var resizeY = resizeForm['resize-y'];
+  var resizeSize = resizeForm['resize-size'];
 
-	resizeX.value = 0;
-	resizeY.value = 0;
-	resizeSize.value = 50;
+  resizeX.value = 0;
+  resizeY.value = 0;
+  resizeSize.value = 50;
 
-	resizeX.min = parseInt(0);
-	resizeY.min = parseInt(0);
-	resizeSize.min = parseInt(1);
+  resizeX.min = 0;
+  resizeY.min = 0;
+  resizeSize.min = 1;
 
-	function setResizeShift(){
-		resizeX.max = parseInt(previewImage.naturalWidth) - parseInt(resizeSize.value);
-		resizeY.max = parseInt(previewImage.naturalHeight) - parseInt(resizeSize.value);
-		if (resizeX.value > resizeX.max){
-			resizeX.value = resizeX.max;
-		}
-		if (resizeY.value > resizeY.max){
-			resizeY.value = resizeY.max;
-		}
-	}
-	function displacementIsValid() {
-		if (!resizeX.max || !resizeY.max) {
-			setResizeShift();
-		}
-		return resizeX.value <= resizeX.max && resizeY.value <= resizeY.max;
-	}
+  function setResizeShift(){
+    resizeX.max = Math.max(parseInt(previewImage.naturalWidth) - parseInt(resizeSize.value), 0);
+    resizeY.max = Math.max(parseInt(previewImage.naturalHeight) - parseInt(resizeSize.value), 0);
 
-	function setSide() {
-		resizeSize.max = Math.min(
-			previewImage.naturalWidth - resizeX.value,
-			previewImage.naturalHeight - resizeY.value);
+    if (resizeX.value > resizeX.max){
+      resizeX.value = resizeX.max;
+    }
+    if (resizeY.value > resizeY.max){
+      resizeY.value = resizeY.max;
+    }
+  }
+  function displacementIsValid() {
+    if (!resizeX.max || !resizeY.max) {
+      setResizeShift();
+    }
+    return resizeX.value <= resizeX.max && resizeY.value <= resizeY.max;
+  }
 
-		if (resizeSize.value > resizeSize.max) {
-			resizeSize.value = Math.max(resizeSize.max, resizeSize.min);
-		}
-	}
-	function sideIsValid() {
-		if (!resizeSize.max) {
-			setSide();
-		}
-		return resizeSize.value <= resizeSize.max;
-	}
-	resizeX.onchange = function() {
-		if (!resizeX.max) {
-			setResizeShift();
-		}
-		setSide();
-	};
-	resizeY.onchange = function() {
-		if (!resizeY.max) {
-			setResizeShift();
-		}
-		setSide();
-	};
-	resizeSize.onchange = function() {
-		if (!resizeSize.max) {
-			setSide();
-		}
-		setResizeShift();
-	};
-	prevButton.onclick = function(evt) {
-		evt.preventDefault();
+  function setSide() {
+    resizeSize.max = Math.min(
+      previewImage.naturalWidth - resizeX.value,
+      previewImage.naturalHeight - resizeY.value);
 
-		resizeForm.reset();
-		uploadForm.reset();
-		resizeForm.classList.add('invisible');
-		uploadForm.classList.remove('invisible');
-	};
-	resizeForm.onsubmit = function(evt) {
-		evt.preventDefault();
-		if (sideIsValid() && displacementIsValid()) {
-			filterForm.elements['filter-image-src'] = previewImage.src;
+    if (resizeSize.value > resizeSize.max) {
+      resizeSize.value = Math.max(resizeSize.max, resizeSize.min);
+    }
+  }
+  function sideIsValid() {
+    if (!resizeSize.max) {
+      setSide();
+    }
+    return resizeSize.value <= resizeSize.max;
+  }
+  resizeX.onchange = function() {
+    if (!resizeX.max) {
+      setResizeShift();
+    }
+    setSide();
+  };
+  resizeY.onchange = function() {
+    if (!resizeY.max) {
+      setResizeShift();
+    }
+    setSide();
+  };
+  resizeSize.onchange = function() {
+    if (!resizeSize.max) {
+      setSide();
+    }
+    setResizeShift();
+  };
+  prevButton.onclick = function(evt) {
+    evt.preventDefault();
 
-			resizeForm.classList.add('invisible');
-			filterForm.classList.remove('invisible');
-		}
-	};
+    resizeForm.reset();
+    uploadForm.reset();
+    resizeForm.classList.add('invisible');
+    uploadForm.classList.remove('invisible');
+  };
+  resizeForm.onsubmit = function(evt) {
+    evt.preventDefault();
+    if (sideIsValid() && displacementIsValid()) {
+      filterForm.elements['filter-image-src'] = previewImage.src;
+
+      resizeForm.classList.add('invisible');
+      filterForm.classList.remove('invisible');
+    }
+  };
 })();
 
