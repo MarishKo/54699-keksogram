@@ -14,12 +14,14 @@
     var picturesContainer = document.querySelector('.pictures');
     var pictureTemplate = document.getElementById('picture-template');
 
+
     var picturesFragment = document.createDocumentFragment();
 
     pictures.forEach(function (picture, i){
         var newPictureElement = pictureTemplate.content.children[0].cloneNode(true);
         var statsContainer = newPictureElement.querySelector('.picture-stats');
         var firstImg = newPictureElement.querySelector('img');
+
 
         var statElement = document.createElement('span');
         statElement.classList.add('picture-stat');
@@ -43,17 +45,18 @@
                 pictureBackground.height = '182';
                 clearTimeout(imageLoadTimeout);
             }
-
             pictureBackground.src = picture['url'];
 
             pictureBackground.onerror = function(evt) {
                 newPictureElement.classList.add('picture-load-failure');
             };
+            newPictureElement.href = picture['url'];
         }
         picturesFragment.appendChild(newPictureElement);
     });
 
     picturesContainer.appendChild(picturesFragment);
     filtersForm.classList.remove('hidden');
+
 
 })();
