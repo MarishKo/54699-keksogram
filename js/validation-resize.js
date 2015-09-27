@@ -19,8 +19,8 @@
   resizeSize.min = 1;
 
   function setResizeShift(){
-    resizeX.max = Math.max(parseInt(previewImage.naturalWidth) - parseInt(resizeSize.value), 0);
-    resizeY.max = Math.max(parseInt(previewImage.naturalHeight) - parseInt(resizeSize.value), 0);
+    resizeX.max = Math.max((parseInt(previewImage.naturalWidth) - parseInt(resizeSize.value)), 0);
+    resizeY.max = Math.max((parseInt(previewImage.naturalHeight) - parseInt(resizeSize.value)), 0);
 
     if (resizeX.value > resizeX.max){
       resizeX.value = resizeX.max;
@@ -29,21 +29,22 @@
       resizeY.value = resizeY.max;
     }
   }
+  function setSide() {
+    if (previewImage.naturalWidth > previewImage.naturalHeight){
+      resizeSize.max = Math.min(previewImage.naturalHeight - parseInt(resizeX.value),previewImage.naturalHeight - parseInt(resizeY.value));
+    }
+      resizeSize.max = Math.min(previewImage.naturalWidth - parseInt(resizeX.value),previewImage.naturalWidth - parseInt(resizeY.value));
+
+    if (resizeSize.value > resizeSize.max) {
+      resizeSize.value = Math.max(resizeSize.max, resizeSize.min);
+    }
+  }
+
   function displacementIsValid() {
     if (!resizeX.max || !resizeY.max) {
       setResizeShift();
     }
     return resizeX.value <= resizeX.max && resizeY.value <= resizeY.max;
-  }
-
-  function setSide() {
-    resizeSize.max = Math.min(
-      previewImage.naturalWidth - resizeX.value,
-      previewImage.naturalHeight - resizeY.value);
-
-    if (resizeSize.value > resizeSize.max) {
-      resizeSize.value = Math.max(resizeSize.max, resizeSize.min);
-    }
   }
   function sideIsValid() {
     if (!resizeSize.max) {
@@ -52,16 +53,10 @@
     return resizeSize.value <= resizeSize.max;
   }
   resizeX.onchange = function() {
-    if (!resizeX.max) {
       setResizeShift();
-    }
-    setSide();
   };
   resizeY.onchange = function() {
-    if (!resizeY.max) {
       setResizeShift();
-    }
-    setSide();
   };
   resizeSize.onchange = function() {
     if (!resizeSize.max) {
