@@ -1,28 +1,85 @@
 ﻿(function() {
-var validateResize = document.forms['upload-resize'];
-var resizeX = validateResize['resize-x'];
-var resizeY = validateResize['resize-y'];
-var resizeSize = validateResize['resize-size'];
-var resizeImage = document.getElementsByClassName('resize-image-preview');
+  var uploadForm = document.forms['upload-select-image'];
+  var resizeForm = document.forms['upload-resize'];
+  var filterForm = document.forms['upload-filter'];
 
-var MIN_SIZE = 50;
-resizeX.value = 10;
-resizeY.value = 10;
-resizeSize.value = 50;
+  var previewImage = resizeForm.querySelector('.resize-image-preview');
+  var prevButton = resizeForm['resize-prev'];
 
-resizeSize.onchange = function(evt){
-	resizeX.max = resizeImage[0].offsetWidth - parseInt(resizeSize.value);
-	resizeY.max = resizeImage[0].offsetHeight - parseInt(resizeSize.value);
-	resizeSize.max = parseInt(resizeImage[0].offsetWidth);
-	resizeSize.min = parseInt(MIN_SIZE);
-};
-resizeX.onchange = function(evt){
-	resizeX.max = resizeImage[0].offsetWidth - parseInt(resizeSize.value);
-	resizeX.min = parseInt(0);
-};
-resizeY.onchange = function(evt){
-	resizeY.max = resizeImage[0].offsetHeight - parseInt(resizeSize.value);
-	resizeY.min = parseInt(0);
-};
+  var resizeX = resizeForm['resize-x'];
+  var resizeY = resizeForm['resize-y'];
+  var resizeSize = resizeForm['resize-size'];
+
+  resizeX.value = 0;
+  resizeY.value = 0;
+  resizeSize.value = 50;
+
+  resizeX.min = 0;
+  resizeY.min = 0;
+  resizeSize.min = 1;
+
+  function setResizeShift(){
+    resizeX.max = Math.max((parseInt(previewImage.naturalWidth) - parseInt(resizeSize.value)), 0);
+    resizeY.max = Math.max((parseInt(previewImage.naturalHeight) - parseInt(resizeSize.value)), 0);
+
+    if (resizeX.value > resizeX.max){
+      resizeX.value = resizeX.max;
+    }
+    if (resizeY.value > resizeY.max){
+      resizeY.value = resizeY.max;
+    }
+  }
+  function setSide() {
+    if (previewImage.naturalWidth > previewImage.naturalHeight){
+      resizeSize.max = Math.min(previewImage.naturalHeight - parseInt(resizeX.value),previewImage.naturalHeight - parseInt(resizeY.value));
+    }
+      resizeSize.max = Math.min(previewImage.naturalWidth - parseInt(resizeX.value),previewImage.naturalWidth - parseInt(resizeY.value));
+
+    if (resizeSize.value > resizeSize.max) {
+      resizeSize.value = Math.max(resizeSize.max, resizeSize.min);
+    }
+  }
+
+  function displacementIsValid() {
+    if (!resizeX.max || !resizeY.max) {
+      setResizeShift();
+    }
+    return resizeX.value <= resizeX.max && resizeY.value <= resizeY.max;
+  }
+  function sideIsValid() {
+    if (!resizeSize.max) {
+      setSide();
+    }
+    return resizeSize.value <= resizeSize.max;
+  }
+  resizeX.onchange = function() {
+      setResizeShift();
+  };
+  resizeY.onchange = function() {
+      setResizeShift();
+  };
+  resizeSize.onchange = function() {
+    if (!resizeSize.max) {
+      setSide();
+    }
+    setResizeShift();
+  };
+  prevButton.onclick = function(evt) {
+    evt.preventDefault();
+
+    resizeForm.reset();
+    uploadForm.reset();
+    resizeForm.classList.add('invisible');
+    uploadForm.classList.remove('invisible');
+  };
+  resizeForm.onsubmit = function(evt) {
+    evt.preventDefault();
+    if (sideIsValid() && displacementIsValid()) {
+      filterForm.elements['filter-image-src'] = previewImage.src;
+
+      resizeForm.classList.add('invisible');
+      filterForm.classList.remove('invisible');
+    }
+  };
 })();
 
