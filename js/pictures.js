@@ -118,13 +118,11 @@
        case 'filter-new':
         filteredPictures = filteredPictures.sort(function(a, b) {
           if (a.date > b.date) {
-            return -1;
-          }
-
-          if (a.date < b.date) {
             return 1;
           }
-
+          if (a.date < b.date) {
+            return -1;
+          }
           if (a.date === b.date) {
             return 0;
           }
@@ -134,18 +132,15 @@
       case 'filter-discussed':
         filteredPictures = filteredPictures.sort(function(c, d) {
           if (c.comments > d.comments || (d.comments && c.comments === 0)) {
-            return 1;
-          }
-
-          if (c.comments < d.comments || (c.comments && d.comments === 0)) {
             return -1;
           }
-
+          if (c.comments < d.comments || (c.comments && d.comments === 0)) {
+            return 1;
+          }
           if (c.comments === d.comments) {
             return 0;
           }
         });
-
         break;
 
       default:
@@ -157,11 +152,16 @@
 
   function initFilters() {
     var filterElements = document.querySelectorAll('.filters-radio');
+    var filterChecked = document.querySelector('.filters-radio:checked');
+
     for (var i = 0, l = filterElements.length; i < l; i++) {
       filterElements[i].onclick = function(evt) {
-        var clickedFilter = evt.currentTarget;
-        setActiveFilter(clickedFilter.id);
-        clickedFilter.setAttribute('checked', 'checked');
+          var clickedFilter = evt.currentTarget;
+          if(filterChecked != clickedFilter){
+            setActiveFilter(clickedFilter.id);
+            filterChecked = clickedFilter;
+          }
+          clickedFilter.checked = true;
       }
     }
   }
