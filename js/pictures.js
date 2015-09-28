@@ -25,13 +25,13 @@
   var pictures;
 
   var picturesFragment = document.createDocumentFragment();
+  var templateChild = pictureTemplate.content.children[0];
 
   function renderPictures(pictures) {
 
     picturesContainer.innerHTML = '';
-
     pictures.forEach(function (picture, i) {
-      var newPictureElement = pictureTemplate.content.children[0].cloneNode(true);
+      var newPictureElement = templateChild.cloneNode(true);
       var statsContainer = newPictureElement.querySelector('.picture-stats');
       var firstImg = newPictureElement.querySelector('img');
 
