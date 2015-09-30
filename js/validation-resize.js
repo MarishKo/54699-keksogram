@@ -1,4 +1,6 @@
-﻿(function() {
+'use strict';
+
+(function() {
   var uploadForm = document.forms['upload-select-image'];
   var resizeForm = document.forms['upload-resize'];
   var filterForm = document.forms['upload-filter'];
@@ -18,22 +20,22 @@
   resizeY.min = 0;
   resizeSize.min = 1;
 
-  function setResizeShift(){
-    resizeX.max = Math.max((parseInt(previewImage.naturalWidth) - parseInt(resizeSize.value)), 0);
-    resizeY.max = Math.max((parseInt(previewImage.naturalHeight) - parseInt(resizeSize.value)), 0);
+  function setResizeShift() {
+    resizeX.max = Math.max( (parseInt(previewImage.naturalWidth, 10) - parseInt(resizeSize.value, 10)), 0);
+    resizeY.max = Math.max( (parseInt(previewImage.naturalHeight, 10) - parseInt(resizeSize.value, 10)), 0);
 
-    if (resizeX.value > resizeX.max){
+    if (resizeX.value > resizeX.max) {
       resizeX.value = resizeX.max;
     }
-    if (resizeY.value > resizeY.max){
+    if (resizeY.value > resizeY.max) {
       resizeY.value = resizeY.max;
     }
   }
   function setSide() {
-    if (previewImage.naturalWidth > previewImage.naturalHeight){
-      resizeSize.max = Math.min(previewImage.naturalHeight - parseInt(resizeX.value),previewImage.naturalHeight - parseInt(resizeY.value));
+    if (previewImage.naturalWidth > previewImage.naturalHeight) {
+      resizeSize.max = Math.min(previewImage.naturalHeight - parseInt(resizeX.value, 10), previewImage.naturalHeight - parseInt(resizeY.value, 10));
     }
-      resizeSize.max = Math.min(previewImage.naturalWidth - parseInt(resizeX.value),previewImage.naturalWidth - parseInt(resizeY.value));
+    resizeSize.max = Math.min(previewImage.naturalWidth - parseInt(resizeX.value, 10), previewImage.naturalWidth - parseInt(resizeY.value, 10));
 
     if (resizeSize.value > resizeSize.max) {
       resizeSize.value = Math.max(resizeSize.max, resizeSize.min);
@@ -53,10 +55,10 @@
     return resizeSize.value <= resizeSize.max;
   }
   resizeX.onchange = function() {
-      setResizeShift();
+    setResizeShift();
   };
   resizeY.onchange = function() {
-      setResizeShift();
+    setResizeShift();
   };
   resizeSize.onchange = function() {
     if (!resizeSize.max) {

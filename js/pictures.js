@@ -1,6 +1,5 @@
-/**
- * Created by Марина on 23.09.2015.
- */
+'use strict';
+
 (function() {
 
   var ReadyState = {
@@ -22,16 +21,16 @@
   var REQUEST_FAILURE_TIMEOUT = 10000;
   var picturesContainer = document.querySelector('.pictures');
   var pictureTemplate = document.getElementById('picture-template');
-  var pictures;
+  var picturesData;
 
   var picturesFragment = document.createDocumentFragment();
+  var templateChild = pictureTemplate.content.children[0];
 
   function renderPictures(pictures) {
 
     picturesContainer.innerHTML = '';
-
-    pictures.forEach(function (picture, i) {
-      var newPictureElement = pictureTemplate.content.children[0].cloneNode(true);
+    pictures.forEach(function(picture) {
+      var newPictureElement = templateChild.cloneNode(true);
       var statsContainer = newPictureElement.querySelector('.picture-stats');
       var firstImg = newPictureElement.querySelector('img');
 
@@ -48,19 +47,19 @@
 
         var pictureBackground = new Image();
 
-        var imageLoadTimeout = setTimeout(function () {
+        var imageLoadTimeout = setTimeout(function() {
           newPictureElement.classList.add('picture-load-failure');
         }, REQUEST_FAILURE_TIMEOUT);
 
-        pictureBackground.onload = function () {
+        pictureBackground.onload = function() {
           newPictureElement.replaceChild(pictureBackground, firstImg);
           pictureBackground.width = '182';
           pictureBackground.height = '182';
           clearTimeout(imageLoadTimeout);
-        }
+        };
         pictureBackground.src = picture['url'];
 
-        pictureBackground.onerror = function (evt) {
+        pictureBackground.onerror = function() {
           newPictureElement.classList.add('picture-load-failure');
         };
         newPictureElement.href = picture['url'];
@@ -94,10 +93,10 @@
 
         case ReadyState.DONE:
         default:
-          if (loadedXhr.status == 200) {
-            var data = loadedXhr.response;
+          if (loadedXhr.status === 200) {
+            var data = loadedXhr.response.toString();
             picturesContainer.classList.remove('pictures-loading');
-            callback(JSON.parse(data));
+            return callback(JSON.parse(data));
           }
 
           if (loadedXhr.status > 400) {
@@ -109,13 +108,13 @@
 
     xhr.ontimeout = function() {
       showLoadFailure();
-    }
+    };
   }
   function filterPictures(pictures, filterID) {
     var filteredPictures = pictures.slice(0);
     switch (filterID) {
 
-       case 'filter-new':
+      case 'filter-new':
         filteredPictures = filteredPictures.sort(function(a, b) {
           if (a.date > b.date) {
             return -1;
@@ -150,29 +149,30 @@
     return filteredPictures;
   }
 
+  function setActiveFilter(filterID) {
+    var filteredPictures = filterPictures(picturesData, filterID);
+    renderPictures(filteredPictures);
+  }
+
   function initFilters() {
     var filterElements = document.querySelectorAll('.filters-radio');
     var filterChecked = document.querySelector('.filters-radio:checked');
 
     for (var i = 0, l = filterElements.length; i < l; i++) {
       filterElements[i].onclick = function(evt) {
-          var clickedFilter = evt.currentTarget;
-          if(filterChecked != clickedFilter){
-            setActiveFilter(clickedFilter.id);
-            filterChecked = clickedFilter;
-          }
-          clickedFilter.checked = true;
-      }
+        var clickedFilter = evt.currentTarget;
+        if (filterChecked !== clickedFilter) {
+          setActiveFilter(clickedFilter.id);
+          filterChecked = clickedFilter;
+        }
+        clickedFilter.checked = true;
+      };
     }
-  }
-  function setActiveFilter(filterID) {
-    var filteredPictures = filterPictures(pictures, filterID);
-    renderPictures(filteredPictures);
   }
 
   initFilters();
-  loadPictures(function(loadedPictures){
-    pictures = loadedPictures;
+  loadPictures(function(loadedPictures) {
+    picturesData = loadedPictures;
     setActiveFilter('filter-popular');
   });
 
