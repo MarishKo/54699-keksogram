@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 (function() {
   var uploadForm = document.forms['upload-select-image'];
