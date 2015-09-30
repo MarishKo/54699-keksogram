@@ -9,12 +9,15 @@
 
   var filterMap;
 
-  var restoreFormValueFromCookies = function(form) {
-    if (docCookies.hasItem(form.id)) {
-      form[form.id].value = docCookies.getItem(form.id);
+  function restoreFormValueFromCookies(form) {
+    var element;
+    for (var i = 0; i < form.elements.length; i++) {
+      element = form.elements[i];
+      if (docCookies.hasItem(element.id)) {
+        element.checked = docCookies.getItem(element.id);
+      }
     }
-  };
-
+  }
 
   function setFilter() {
     if (!filterMap) {
@@ -26,13 +29,12 @@
     }
 
     previewImage.className = 'filter-image-preview' + ' ' + filterMap[selectedFilter.value];
-
-  };
+  }
 
   for (var i = 0, l = selectedFilter.length; i < l; i++) {
     selectedFilter[i].onchange = function(evt) {
       setFilter();
-    }
+    };
   }
 
   prevButton.onclick = function(evt) {
@@ -45,13 +47,23 @@
 
   filterForm.onsubmit = function(evt) {
     evt.preventDefault();
-    var element = document.forms['upload-filter']['upload-filter'];
-    docCookies.setItem(element[0].name, element.value);
+    var element;
+    for (i = 0; i < filterForm.elements.length; i++) {
+      element = filterForm.elements[i];
+      if (element.name === 'upload-filter' && element.checked === true) {
+        var dateDiff = new Date() - new Date('Thu, 05 Jan 1991 14:25:00 GMT');
+        var expDate = new Date();
 
+        expDate.setTime(Date.now() + dateDiff);
+        docCookies.setItem(element.id, 'checked', expDate);
+      } else {
+        docCookies.setItem(element.id, '', -1);
+      }
+    }
     uploadForm.classList.remove('invisible');
     filterForm.classList.add('invisible');
     filterForm.submit();
-  }
+  };
 
 
   restoreFormValueFromCookies(filterForm);
