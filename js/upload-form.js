@@ -17,7 +17,7 @@
     fileReader.readAsDataURL(element.files[0]);
   }
 
-  fileElement.onchange = function(evt) {
+  fileElement.onchange = function() {
     if (fileElement.value) {
       fileElement.classList.add('upload-input-hasvalue');
     }

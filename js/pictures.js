@@ -21,7 +21,7 @@
   var REQUEST_FAILURE_TIMEOUT = 10000;
   var picturesContainer = document.querySelector('.pictures');
   var pictureTemplate = document.getElementById('picture-template');
-  var pictures;
+  var picturesData;
 
   var picturesFragment = document.createDocumentFragment();
   var templateChild = pictureTemplate.content.children[0];
@@ -29,7 +29,7 @@
   function renderPictures(pictures) {
 
     picturesContainer.innerHTML = '';
-    pictures.forEach(function(picture, i) {
+    pictures.forEach(function(picture) {
       var newPictureElement = templateChild.cloneNode(true);
       var statsContainer = newPictureElement.querySelector('.picture-stats');
       var firstImg = newPictureElement.querySelector('img');
@@ -59,7 +59,7 @@
         };
         pictureBackground.src = picture['url'];
 
-        pictureBackground.onerror = function(evt) {
+        pictureBackground.onerror = function() {
           newPictureElement.classList.add('picture-load-failure');
         };
         newPictureElement.href = picture['url'];
@@ -94,9 +94,9 @@
         case ReadyState.DONE:
         default:
           if (loadedXhr.status === 200) {
-            var data = loadedXhr.response;
+            var data = loadedXhr.response.toString();
             picturesContainer.classList.remove('pictures-loading');
-            callback(JSON.parse(data));
+            return callback(JSON.parse(data));
           }
 
           if (loadedXhr.status > 400) {
@@ -150,7 +150,7 @@
   }
 
   function setActiveFilter(filterID) {
-    var filteredPictures = filterPictures(pictures, filterID);
+    var filteredPictures = filterPictures(picturesData, filterID);
     renderPictures(filteredPictures);
   }
 
@@ -172,7 +172,7 @@
 
   initFilters();
   loadPictures(function(loadedPictures) {
-    pictures = loadedPictures;
+    picturesData = loadedPictures;
     setActiveFilter('filter-popular');
   });
 
