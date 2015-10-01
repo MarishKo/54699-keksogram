@@ -1,18 +1,4 @@
-*.iml
-
-## Directory-based project format:
-.idea/
-
-## File-based project format:
-*.ipr
-*.iws
-
-## Plugin-specific files:
-
-# IntelliJ
-/out/
-
-# mpeltonen/sbt-idea plugin
-.idea_modules/
-
+gosha/
 node_modules/
+.idea
+.sublime*

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Open+Sans&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="css/main.css" media="screen" title="no title" charset="utf-8">
-  <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-  <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
   <meta charset="utf-8">
   <title>Keksogram</title>
 </head>
@@ -64,7 +63,14 @@
 
 <div class="pictures"></div>
 
-<template id="picture-template">
+<div class="gallery-overlay invisible">
+  <span class="gallery-overlay-close">&times;</span>
+  <div class="gallery-overlay-preview">
+    <img src="" class="gallery-overlay-image" alt="" />
+  </div>
+</div>
+
+<template class="picture-template">
   <a href="" class="picture">
     <img src="" width="182" height="182">
     <span class="picture-stats">
@@ -74,16 +80,11 @@
   </a>
 </template>
 
-
 <script src="lib/cookies.js" charset="utf-8"></script>
 <script src="js/logo-background.js" charset="utf-8"></script>
 <script src="js/resize-form.js" charset="utf-8"></script>
 <script src="js/upload-form.js" charset="utf-8"></script>
-
-<script src="js/validation-resize.js" charset="utf-8"></script>
 <script src="js/filter-form.js" charset="utf-8"></script>
-
-<script src="js/pictures.js"></script>
 
 </body>
 </html>
