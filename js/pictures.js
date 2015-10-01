@@ -19,17 +19,30 @@
   };
 
   var REQUEST_FAILURE_TIMEOUT = 10000;
+  var PAGE_SIZE = 12;
+
   var picturesContainer = document.querySelector('.pictures');
   var pictureTemplate = document.getElementById('picture-template');
   var picturesData;
+  var currentPictures;
+  var currentPage = 0;
+
 
   var picturesFragment = document.createDocumentFragment();
   var templateChild = pictureTemplate.content.children[0];
 
-  function renderPictures(pictures) {
+  function renderPictures(picturesToRender, pageNumber, replace) {
+    replace = typeof replace !== 'undefined' ? replace : true;
+    pageNumber = pageNumber || 0;
 
-    picturesContainer.innerHTML = '';
-    pictures.forEach(function(picture) {
+    if (replace) {
+      picturesContainer.innerHTML = '';
+    }
+    var pictureFrom = pageNumber * PAGE_SIZE;
+    var pictureTo = pictureFrom + PAGE_SIZE;
+    picturesToRender = picturesToRender.slice(pictureFrom, pictureTo);
+
+    picturesToRender.forEach(function(picture) {
       var newPictureElement = templateChild.cloneNode(true);
       var statsContainer = newPictureElement.querySelector('.picture-stats');
       var firstImg = newPictureElement.querySelector('img');
@@ -110,8 +123,8 @@
       showLoadFailure();
     };
   }
-  function filterPictures(pictures, filterID) {
-    var filteredPictures = pictures.slice(0);
+  function filterPictures(picturesToFilter, filterID) {
+    var filteredPictures = picturesToFilter.slice(0);
     switch (filterID) {
 
       case 'filter-new':
@@ -141,40 +154,73 @@
           }
         });
         break;
+      case 'filter-popular':
+        filteredPictures = picturesToFilter.slice(0);
+        break;
 
       default:
-        filteredPictures = pictures.slice(0);
+        filteredPictures = picturesToFilter.slice(0);
         break;
     }
+    localStorage.setItem('filterID', filterID);
+    var activeFilterChecked = document.getElementById(filterID);
+    activeFilterChecked.checked = true;
+    localStorage.setItem('activeFilterChecked', activeFilterChecked.checked);
     return filteredPictures;
   }
 
   function setActiveFilter(filterID) {
-    var filteredPictures = filterPictures(picturesData, filterID);
-    renderPictures(filteredPictures);
+    currentPictures = filterPictures(picturesData, filterID);
+    currentPage = 0;
+    renderPictures(currentPictures, currentPage, true);
+  }
+  function isNextPageAvailable() {
+    return currentPage < Math.ceil(picturesData.length / PAGE_SIZE);
+  }
+
+  function isAtTheBottom() {
+    var GAP = 100;
+    return picturesContainer.getBoundingClientRect().bottom - GAP <= window.innerHeight;
+  }
+  function checkNextPage() {
+    if (isAtTheBottom() && isNextPageAvailable()) {
+      window.dispatchEvent(new CustomEvent('loadneeded'));
+    }
+  }
+  function initScroll() {
+    var someTimeout;
+    window.addEventListener('scroll', function() {
+      clearTimeout(someTimeout);
+      someTimeout = setTimeout(checkNextPage, 100);
+    });
+
+    window.addEventListener('loadneeded', function() {
+      renderPictures(currentPictures, currentPage++, false);
+    });
+
   }
 
   function initFilters() {
     var filterElements = document.querySelectorAll('.filters-radio');
-    var filterChecked = document.querySelector('.filters-radio:checked');
+    var filterChecked = document.querySelector('#' + localStorage.getItem('filterID')) ||
+      document.querySelector('.filters-radio:checked');
 
     for (var i = 0, l = filterElements.length; i < l; i++) {
-      filterElements[i].onclick = function(evt) {
+      filterElements[i].addEventListener('click', function(evt) {
         var clickedFilter = evt.currentTarget;
         if (filterChecked !== clickedFilter) {
           setActiveFilter(clickedFilter.id);
           filterChecked = clickedFilter;
         }
         clickedFilter.checked = true;
-      };
+      });
     }
   }
 
   initFilters();
+  initScroll();
   loadPictures(function(loadedPictures) {
     picturesData = loadedPictures;
-    setActiveFilter('filter-popular');
+    setActiveFilter(localStorage.getItem('filterID') || 'filter-popular');
   });
-
-
 })();
