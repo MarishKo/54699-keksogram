@@ -163,9 +163,6 @@
         break;
     }
     localStorage.setItem('filterID', filterID);
-    var activeFilterChecked = document.getElementById(filterID);
-    activeFilterChecked.checked = true;
-    localStorage.setItem('activeFilterChecked', activeFilterChecked.checked);
     return filteredPictures;
   }
 
@@ -193,28 +190,15 @@
       clearTimeout(someTimeout);
       someTimeout = setTimeout(checkNextPage, 100);
     });
-
     window.addEventListener('loadneeded', function() {
       renderPictures(currentPictures, currentPage++, false);
     });
-
   }
 
   function initFilters() {
-    var filterElements = document.querySelectorAll('.filters-radio');
-    var filterChecked = document.querySelector('#' + localStorage.getItem('filterID')) ||
-      document.querySelector('.filters-radio:checked');
-
-    for (var i = 0, l = filterElements.length; i < l; i++) {
-      filterElements[i].addEventListener('click', function(evt) {
-        var clickedFilter = evt.currentTarget;
-        if (filterChecked !== clickedFilter) {
-          setActiveFilter(clickedFilter.id);
-          filterChecked = clickedFilter;
-        }
-        clickedFilter.checked = true;
-      });
-    }
+    document.querySelector('.filters').addEventListener('click', function(evt) {
+      setActiveFilter(evt.target.id);
+    });
   }
 
   initFilters();
@@ -222,5 +206,7 @@
   loadPictures(function(loadedPictures) {
     picturesData = loadedPictures;
     setActiveFilter(localStorage.getItem('filterID') || 'filter-popular');
+    var checkedFilter = document.getElementById(localStorage.getItem('filterID'));
+    checkedFilter.checked = true;
   });
 })();
