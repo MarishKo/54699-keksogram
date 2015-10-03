@@ -129,31 +129,16 @@
 
       case 'filter-new':
         filteredPictures = filteredPictures.sort(function(a, b) {
-          if (a.date > b.date) {
-            return -1;
-          }
-          if (a.date < b.date) {
-            return 1;
-          }
-          if (a.date === b.date) {
-            return 0;
-          }
+          return new Date(b.date) - new Date(a.date);
         });
         break;
 
       case 'filter-discussed':
         filteredPictures = filteredPictures.sort(function(c, d) {
-          if (c.comments > d.comments || (d.comments && c.comments === 0)) {
-            return -1;
-          }
-          if (c.comments < d.comments || (c.comments && d.comments === 0)) {
-            return 1;
-          }
-          if (c.comments === d.comments) {
-            return 0;
-          }
+          return parseInt(d.comments, 10) - parseInt(c.comments, 10);
         });
         break;
+
       case 'filter-popular':
         filteredPictures = picturesToFilter.slice(0);
         break;
