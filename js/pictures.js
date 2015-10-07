@@ -10,7 +10,7 @@
     'LOADING': 3,
     'DONE': 4
   };
-  
+
   var filtersForm = document.querySelector('.filters');
   filtersForm.classList.add('hidden');
 
