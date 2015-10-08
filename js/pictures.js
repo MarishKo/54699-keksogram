@@ -1,3 +1,4 @@
+/* global Photo: true */
 'use strict';
 
 (function() {
@@ -13,73 +14,37 @@
   var filtersForm = document.querySelector('.filters');
   filtersForm.classList.add('hidden');
 
-  var statClassName = {
-    'comments': 'picture-comments',
-    'likes': 'picture-likes'
-  };
-
   var REQUEST_FAILURE_TIMEOUT = 10000;
   var PAGE_SIZE = 12;
 
   var picturesContainer = document.querySelector('.pictures');
-  var pictureTemplate = document.getElementById('picture-template');
   var picturesData;
   var currentPictures;
   var currentPage = 0;
-
+  var renderedPictures = [];
 
   var picturesFragment = document.createDocumentFragment();
-  var templateChild = pictureTemplate.content.children[0];
 
   function renderPictures(picturesToRender, pageNumber, replace) {
     replace = typeof replace !== 'undefined' ? replace : true;
     pageNumber = pageNumber || 0;
 
     if (replace) {
-      picturesContainer.innerHTML = '';
+      var el;
+      while ((el = renderedPictures.shift())) {
+        el.unrender();
+      }
+      picturesContainer.classList.remove('pictures-failure');
     }
     var pictureFrom = pageNumber * PAGE_SIZE;
     var pictureTo = pictureFrom + PAGE_SIZE;
     picturesToRender = picturesToRender.slice(pictureFrom, pictureTo);
 
-    picturesToRender.forEach(function(picture) {
-      var newPictureElement = templateChild.cloneNode(true);
-      var statsContainer = newPictureElement.querySelector('.picture-stats');
-      var firstImg = newPictureElement.querySelector('img');
-
-
-      var statElement = document.createElement('span');
-      statElement.classList.add('picture-stat');
-      statElement.classList.add(statClassName[picture]);
-      statsContainer.appendChild(statElement);
-
-      newPictureElement.querySelector('.picture-comments').textContent = picture['comments'];
-      newPictureElement.querySelector('.picture-likes').textContent = picture['likes'];
-
-      if (picture['url']) {
-
-        var pictureBackground = new Image();
-
-        var imageLoadTimeout = setTimeout(function() {
-          newPictureElement.classList.add('picture-load-failure');
-        }, REQUEST_FAILURE_TIMEOUT);
-
-        pictureBackground.onload = function() {
-          newPictureElement.replaceChild(pictureBackground, firstImg);
-          pictureBackground.width = '182';
-          pictureBackground.height = '182';
-          clearTimeout(imageLoadTimeout);
-        };
-        pictureBackground.src = picture['url'];
-
-        pictureBackground.onerror = function() {
-          newPictureElement.classList.add('picture-load-failure');
-        };
-        newPictureElement.href = picture['url'];
-      }
-      picturesFragment.appendChild(newPictureElement);
+    picturesToRender.forEach(function(photoData) {
+      var newPicturesElement = new Photo(photoData);
+      newPicturesElement.render(picturesFragment);
+      renderedPictures.push(newPicturesElement);
     });
-
     picturesContainer.appendChild(picturesFragment);
     filtersForm.classList.remove('hidden');
   }
@@ -142,10 +107,6 @@
       case 'filter-popular':
         filteredPictures = picturesToFilter.slice(0);
         break;
-
-      default:
-        filteredPictures = picturesToFilter.slice(0);
-        break;
     }
     localStorage.setItem('filterID', filterID);
     return filteredPictures;
@@ -155,14 +116,18 @@
     currentPictures = filterPictures(picturesData, filterID);
     currentPage = 0;
     renderPictures(currentPictures, currentPage, true);
+    if ((picturesContainer.offsetHeight - 20) < window.innerHeight) {
+      renderPictures(currentPictures, currentPage++, false);
+    }
   }
   function isNextPageAvailable() {
     return currentPage < Math.ceil(picturesData.length / PAGE_SIZE);
   }
 
   function isAtTheBottom() {
-    var GAP = 100;
+    var GAP = 20;
     return picturesContainer.getBoundingClientRect().bottom - GAP <= window.innerHeight;
+
   }
   function checkNextPage() {
     if (isAtTheBottom() && isNextPageAvailable()) {
