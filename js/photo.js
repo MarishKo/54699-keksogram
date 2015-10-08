@@ -5,10 +5,7 @@
   var pictureTemplate = document.getElementById('picture-template');
 
   var REQUEST_FAILURE_TIMEOUT = 10000;
-  var statClassName = {
-    'comments': 'picture-comments',
-    'likes': 'picture-likes'
-  };
+
   var Photo = function(data) {
     this._data = data;
     this._onClick = this._onClick.bind(this);
@@ -16,13 +13,7 @@
 
   Photo.prototype.render = function(container) {
     var newPictureElement = pictureTemplate.content.children[0].cloneNode(true);
-    var statsContainer = newPictureElement.querySelector('.picture-stats');
     var firstImg = newPictureElement.querySelector('img');
-    var statElement = statsContainer.querySelector('span');
-    statElement.classList.add('picture-stat');
-    statElement.classList.add(statClassName[this._data]);
-    statsContainer.appendChild(statElement);
-
     newPictureElement.querySelector('.picture-comments').textContent = this._data['comments'];
     newPictureElement.querySelector('.picture-likes').textContent = this._data['likes'];
     if (this._data['url']) {

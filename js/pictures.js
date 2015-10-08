@@ -107,10 +107,6 @@
       case 'filter-popular':
         filteredPictures = picturesToFilter.slice(0);
         break;
-
-      default:
-        filteredPictures = picturesToFilter.slice(0);
-        break;
     }
     localStorage.setItem('filterID', filterID);
     return filteredPictures;
