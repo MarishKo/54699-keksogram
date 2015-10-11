@@ -1,4 +1,4 @@
-/* global Photo: true */
+/* global Photo: true Gallery: true */
 'use strict';
 
 (function() {
@@ -18,10 +18,12 @@
   var PAGE_SIZE = 12;
 
   var picturesContainer = document.querySelector('.pictures');
+
   var picturesData;
   var currentPictures;
   var currentPage = 0;
   var renderedPictures = [];
+  var gallery = new Gallery();
 
   var picturesFragment = document.createDocumentFragment();
 
@@ -47,6 +49,7 @@
     });
     picturesContainer.appendChild(picturesFragment);
     filtersForm.classList.remove('hidden');
+    gallery.setPhotos(currentPictures);
   }
 
   function showLoadFailure() {
@@ -88,6 +91,7 @@
       showLoadFailure();
     };
   }
+
   function filterPictures(picturesToFilter, filterID) {
     var filteredPictures = picturesToFilter.slice(0);
     switch (filterID) {
@@ -120,6 +124,7 @@
       renderPictures(currentPictures, currentPage++, false);
     }
   }
+
   function isNextPageAvailable() {
     return currentPage < Math.ceil(picturesData.length / PAGE_SIZE);
   }
@@ -129,11 +134,13 @@
     return picturesContainer.getBoundingClientRect().bottom - GAP <= window.innerHeight;
 
   }
+
   function checkNextPage() {
     if (isAtTheBottom() && isNextPageAvailable()) {
       window.dispatchEvent(new CustomEvent('loadneeded'));
     }
   }
+
   function initScroll() {
     var someTimeout;
     window.addEventListener('scroll', function() {
@@ -151,8 +158,22 @@
     });
   }
 
+  function initGallery() {
+    window.addEventListener('galleryclick', function(evt) {
+      evt.preventDefault();
+      var url = evt.detail.photoElement.getData().url;
+      var photosLenght = currentPictures.length;
+      for (var i = 0; i < photosLenght; i++) {
+        if (currentPictures[i].url === url) {
+          gallery.setCurrentPhoto(i);
+        }
+      }
+    });
+  }
+
   initFilters();
   initScroll();
+  initGallery();
   loadPictures(function(loadedPictures) {
     picturesData = loadedPictures;
     setActiveFilter(localStorage.getItem('filterID') || 'filter-popular');
