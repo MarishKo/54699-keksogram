@@ -10,7 +10,6 @@
     this._data = data;
     this._onClick = this._onClick.bind(this);
   };
-
   Photo.prototype.render = function(container) {
     var newPictureElement = pictureTemplate.content.children[0].cloneNode(true);
     var firstImg = newPictureElement.querySelector('img');
@@ -45,11 +44,16 @@
     this._element = null;
   };
 
-  Photo.prototype._onClick = function() {
+  Photo.prototype._onClick = function(evt) {
+    evt.preventDefault();
     if (!this._element.classList.contains('picture-load-failure')) {
       var galleryEvent = new CustomEvent('galleryclick', { detail: { photoElement: this }});
       window.dispatchEvent(galleryEvent);
     }
+  };
+
+  Photo.prototype.getData = function() {
+    return this._data;
   };
 
   window.Photo = Photo;
