@@ -407,3 +407,6 @@ input[type=radio]:checked + .upload-filter-label {
   height: 640px;
   width: 640px;
 }
+.invisible{
+  visibility: hidden;
+}
