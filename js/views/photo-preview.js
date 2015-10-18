@@ -1,3 +1,14 @@
-/**
- * Created by Марина on 15.10.2015.
- */
+'use strict';
+
+(function() {
+  var GalleryPicture = Backbone.View.extend({
+    tagName: 'img',
+
+    render: function() {
+      this.el.src = this.model.get('url');
+
+    }
+  });
+
+  window.GalleryPicture = GalleryPicture;
+})();

@@ -1,29 +1,38 @@
-/* global Photo: true Gallery: true PhotosCollection: true PhotoView: true*/
+/* global Gallery: true PhotosCollection: true PhotoView: true*/
 
 'use strict';
 
 (function() {
 
- /* var ReadyState = {
-    'UNSENT': 0,
-    'OPENED': 1,
-    'HEADERS_RECEIVED': 2,
-    'LOADING': 3,
-    'DONE': 4
-  };*/
-
   var filtersForm = document.querySelector('.filters');
   filtersForm.classList.add('hidden');
-
+  /**
+   * @const
+   * @type {number}
+   */
   var REQUEST_FAILURE_TIMEOUT = 10000;
+  /**
+   * @const
+   * @type {number}
+   */
   var PAGE_SIZE = 12;
-
+  /**
+   * Контейнер списка фотографий.
+   * @type {Element}
+   */
   var picturesContainer = document.querySelector('.pictures');
 
-  var picturesData;
-  var currentPictures;
+  //var currentPictures;
+  // var renderedPictures = [];
+  /**
+   * @type {number}
+   */
   var currentPage = 0;
- // var renderedPictures = [];
+
+  /**
+   * Объект типа фотогалерея.
+   * @type {Gallery}
+   */
   var gallery = new Gallery();
 
   /**
@@ -39,37 +48,14 @@
    * @type {Array.<PhotoView>}
    */
   var renderedViews = [];
-
-  var picturesFragment = document.createDocumentFragment();
-/*
-  function renderPictures(picturesToRender, pageNumber, replace) {
-    replace = typeof replace !== 'undefined' ? replace : true;
-    pageNumber = pageNumber || 0;
-
-    if (replace) {
-      var el;
-      while ((el = renderedPictures.shift())) {
-        el.unrender();
+  var renderedPictures = [];
+  function galleryArrayUrl(element) {
+    var photosLenght = element.length;
+    for (var i = 0; i < photosLenght; i++) {
+      if (element[i].url === url) {
+        gallery.setCurrentPhoto(i);
       }
-      picturesContainer.classList.remove('pictures-failure');
     }
-    var pictureFrom = pageNumber * PAGE_SIZE;
-    var pictureTo = pictureFrom + PAGE_SIZE;
-    picturesToRender = picturesToRender.slice(pictureFrom, pictureTo);
-
-    picturesToRender.forEach(function(photoData) {
-      var newPicturesElement = new Photo(photoData);
-      newPicturesElement.render(picturesFragment);
-      renderedPictures.push(newPicturesElement);
-    });
-    picturesContainer.appendChild(picturesFragment);
-    filtersForm.classList.remove('hidden');
-    gallery.setPhotos(currentPictures);
-  }
-*/
-
-  function showLoadFailure() {
-    picturesContainer.classList.add('pictures-failure');
   }
   /**
    * Выводит на страницу список фото постранично.
@@ -95,54 +81,34 @@
       view.render();
       fragment.appendChild(view.el);
       renderedViews.push(view);
+      renderedPictures.push(view.model.get('url'));
       view.on('galleryclick', function() {
-        //gallery.setPhotos(view.model);
-        //gallery.setCurrentPhoto(currentPictures);
-        //gallery.show();
+        gallery.setPhotos(renderedPictures);
+        gallery.setCurrentPhoto(0);
+        gallery.show();
       });
     });
-
-
     picturesContainer.appendChild(fragment);
     filtersForm.classList.remove('hidden');
   }
+  /**
+   * Добавляет класс ошибки контейнеру с фото. Используется в случае
+   * если произошла ошибка загрузки фото или загрузка прервалась
+   * по таймауту.
+   */
+  function showLoadFailure() {
+    picturesContainer.classList.add('pictures-failure');
+  }
 
- /* function loadPictures(callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.timeout = REQUEST_FAILURE_TIMEOUT;
-    xhr.open('get', 'data/pictures.json');
-    xhr.send();
-
-    xhr.onreadystatechange = function(evt) {
-      var loadedXhr = evt.target;
-
-      switch (loadedXhr.readyState) {
-        case ReadyState.OPENED:
-        case ReadyState.HEADERS_RECEIVED:
-        case ReadyState.LOADING:
-          picturesContainer.classList.add('pictures-loading');
-          break;
-
-        case ReadyState.DONE:
-        default:
-          if (loadedXhr.status === 200) {
-            var data = loadedXhr.response.toString();
-            picturesContainer.classList.remove('pictures-loading');
-            return callback(JSON.parse(data));
-          }
-
-          if (loadedXhr.status > 400) {
-            showLoadFailure();
-          }
-          break;
-      }
-    };
-
-    xhr.ontimeout = function() {
-      showLoadFailure();
-    };
-  } */
-
+  /**
+   * Фильтрация списка фото. Принимает на вход список фото
+   * и ID фильтра. В зависимости от переданного ID применяет
+   * разные алгоритмы фильтрации. Возвращает отфильтрованный
+   * список и записывает примененный фильтр в localStorage.
+   * Не изменяет исходный массив.
+   * @param {string} filterID
+   * @return {Array.<Object>}
+   */
   function filterPictures(filterID) {
     var filteredPictures = initiallyLoaded.slice(0);
     switch (filterID) {
@@ -165,40 +131,50 @@
     }
     photosCollection.reset(filteredPictures);
     localStorage.setItem('filterID', filterID);
-    //return filteredPictures;
   }
-
+  /**
+   * Вызывает функцию фильтрации на списке отелей с переданным fitlerID
+   * и подсвечивает кнопку активного фильтра.
+   * @param {string} filterID
+   */
   function setActiveFilter(filterID) {
-
     filterPictures(filterID);
     currentPage = 0;
     renderPictures(currentPage, true);
-
-    /*currentPictures = filterPictures(picturesData, filterID);
-
-    currentPage = 0;
-    renderPictures(currentPictures, currentPage, true);
     if ((picturesContainer.offsetHeight - 20) < window.innerHeight) {
-      renderPictures(currentPictures, currentPage++, false);
-    }*/
+      checkNextPage();
+    }
   }
-
+  /**
+   * Проверяет можно ли отрисовать следующую страницу списка отелей.
+   * @return {boolean}
+   */
   function isNextPageAvailable() {
-    return currentPage < Math.ceil(picturesData.length / PAGE_SIZE);
+    return currentPage < Math.ceil(photosCollection.length / PAGE_SIZE);
   }
-
+  /**
+   * Проверяет, находится ли скролл внизу страницы.
+   * @return {boolean}
+   */
   function isAtTheBottom() {
     var GAP = 20;
     return picturesContainer.getBoundingClientRect().bottom - GAP <= window.innerHeight;
-
   }
-
+  /**
+   * Испускает на объекте window событие loadneeded если скролл находится внизу
+   * страницы и существует возможность показать еще одну страницу.
+   */
   function checkNextPage() {
     if (isAtTheBottom() && isNextPageAvailable()) {
       window.dispatchEvent(new CustomEvent('loadneeded'));
     }
   }
 
+  /**
+   * Создает два обработчика событий: на прокручивание окна, который в оптимизированном
+   * режиме (раз в 100 миллисекунд скролла) проверяет можно ли отрисовать следующую страницу;
+   * и обработчик события loadneeded, который вызывает функцию отрисовки следующей страницы.
+   */
   function initScroll() {
     var someTimeout;
     window.addEventListener('scroll', function() {
@@ -206,50 +182,63 @@
       someTimeout = setTimeout(checkNextPage, 100);
     });
     window.addEventListener('loadneeded', function() {
-      renderPictures(currentPictures, currentPage++, false);
+      renderPictures(++currentPage, false);
     });
   }
+  /**
+   * Проверяет есть ли у переданного элемента или одного из его родителей
+   * переданный CSS-класс.
+   * @param {Element} element
+   * @param {string} className
+   * @return {boolean}
+   */
+  function doesHaveParent(element, className) {
+    do {
+      if (element.classList.contains(className)) {
+        return true;
+      }
 
+      element = element.parentElement;
+    } while (element);
+
+    return false;
+  }
+  /**
+   * Инициализация подписки на клики по кнопкам фильтра.
+   * Используется делегирование событий: события обрабатываются на объекте,
+   * содержащем все фильтры, и в момент наступления события, проверяется,
+   * произошел ли клик по фильтру или нет и если да, то вызывается функция
+   * установки фильтра.
+   */
   function initFilters() {
-    document.querySelector('.filters').addEventListener('click', function(evt) {
-      setActiveFilter(evt.target.id);
+    var filtersContainer = document.querySelector('.filters');
+    filtersContainer.addEventListener('click', function(evt) {
+      var clickedFilter = evt.target;
+
+      if (doesHaveParent(clickedFilter, 'filters-radio')) {
+        setActiveFilter(clickedFilter.id);
+      }
     });
   }
 
  /* function initGallery() {
     window.addEventListener('galleryclick', function(evt) {
+      console.log(111);
       evt.preventDefault();
       galleryArrayUrl(evt, currentPictures);
     });
   }
-  function galleryArrayUrl(evt, element) {
-    var url = evt.detail.photoElement.getData().url;
-    var photosLenght = element.length;
-    for (var i = 0; i < photosLenght; i++) {
-      if (element[i].url === url) {
-        gallery.setCurrentPhoto(i);
-      }
-    }
-  }*/
+ */
 
-  /*initFilters();
-  initScroll();
-  initGallery();
-  loadPictures(function(loadedPictures) {
-    picturesData = loadedPictures;
-    setActiveFilter(localStorage.getItem('filterID') || 'filter-popular');
-    var checkedFilter = document.getElementById(localStorage.getItem('filterID'));
-    checkedFilter.checked = true;
-     });*/
+
   photosCollection.fetch({ timeout: REQUEST_FAILURE_TIMEOUT }).success(function(loaded, state, jqXHR) {
     initiallyLoaded = jqXHR.responseJSON;
     initFilters();
     initScroll();
 
-
     setActiveFilter(localStorage.getItem('filterID') || 'filter-popular');
-    //var checkedFilter = document.getElementById(localStorage.getItem('filterID'));
-    //checkedFilter.checked = true;
+    var checkedFilter = document.getElementById(localStorage.getItem('filterID'));
+    checkedFilter.checked = true;
   }).fail(function() {
     showLoadFailure();
   });

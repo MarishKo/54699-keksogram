@@ -8,11 +8,6 @@
    * @type {number}
    */
   var REQUEST_FAILURE_TIMEOUT = 10000;
-
-  var statClassName = {
-    'comments': 'picture-comments',
-    'likes': 'picture-likes'
-  };
   /**
    * @type {Element}
    */
@@ -29,7 +24,7 @@
     initialize: function() {
       this._onImageLoad = this._onImageLoad.bind(this);
       this._onImageFail = this._onImageFail.bind(this);
-     // this._onModelLike = this._onModelLike.bind(this);
+      // this._onModelLike = this._onModelLike.bind(this);
       this._onClick = this._onClick.bind(this);
 
       //this.model.on('change:liked', this._onModelLike);
@@ -56,9 +51,11 @@
      * @override
      */
     render: function() {
-      this.el = pictureTemplate.content.children[0].cloneNode(true);
-      this.el.querySelector('.picture-comments').textContent = this.model.get('comments');
-      this.el.querySelector('.picture-likes').textContent = this.model.get('likes');
+      this._newElement = pictureTemplate.content.children[0].cloneNode(true);
+      this._newElement.querySelector('.picture-comments').textContent = this.model.get('comments');
+      this._newElement.querySelector('.picture-likes').textContent = this.model.get('likes');
+
+      this.el.classList.add('picture');
 
       if (this.model.get('url')) {
         this._pictureBackground = new Image(182, 182);
@@ -80,36 +77,33 @@
      * @private
      */
     _onClick: function(evt) {
-      console.log(111);
       evt.preventDefault();
-      var clickedElement = evt.target;
-
-      if (clickedElement.classList.contains('picture') && !clickedElement.classList.contains('picture-load-failure')) {
+      if (this.el.classList.contains('picture') && !this.el.classList.contains('picture-load-failure')) {
         this.trigger('galleryclick');
       }
     },
 
     /**
-     * @param {Event} evt
      * @private
      */
-    _onImageLoad: function(evt) {
+    _onImageLoad: function() {
       clearTimeout(this._imageLoadTimeout);
-
-      this.el.replaceChild(this._pictureBackground, this.el.querySelector('img'));
-
-      this._cleanupImageListeners(evt.path[0]);
+      this._newElement.replaceChild(this._pictureBackground, this._newElement.querySelector('img'));
+      this.el.appendChild(this._newElement);
+      this._cleanupImageListeners(this._pictureBackground);
     },
 
     /**
      * @param {Event} evt
      * @private
      */
-    _onImageFail: function(evt) {
-      var failedImage = evt.path[0];
-      this._cleanupImageListeners(failedImage);
+    _onImageFail: function() {
+      /*
+       var failedImage = evt.path[0];
+       this._cleanupImageListeners(failedImage);
+       */
 
-      failedImage.src = 'failed.jpg';
+      //failedImage.src = 'failed.jpg';
       this.el.classList.add('picture-load-failure');
     },
 
