@@ -46,6 +46,17 @@
    */
   var renderedViews = [];
   var renderedPictures = [];
+
+  //Функция,проверяющая при клике, совпадает ли url элемента,по которому кликают с url элемента в массиве. если они совпадают
+  //вызывается gallery.setCurrentPhoto
+  function galleryArrayUrl(element, url) {
+    var photosLenght = element.length;
+    for (var i = 0; i < photosLenght; i++) {
+      if (element[i] === url) {
+        gallery.setCurrentPhoto(i);
+      }
+    }
+  }
   /**
    * Выводит на страницу список фото постранично.
    * @param {number} pageNumber
@@ -65,7 +76,7 @@
       }
     }
 
-    photosCollection.slice(picturesFrom, picturesTo).forEach(function(model, i) {
+    photosCollection.slice(picturesFrom, picturesTo).forEach(function(model) {
       var view = new PhotoView({ model: model });
       view.render();
       fragment.appendChild(view.el);
@@ -73,13 +84,14 @@
       renderedPictures.push(view.model.get('url'));
       view.on('galleryclick', function() {
         gallery.setPhotos(renderedPictures);
-        gallery.setCurrentPhoto(i);
+        galleryArrayUrl(renderedPictures, view.model.get('url'));
         gallery.show();
       });
     });
     picturesContainer.appendChild(fragment);
     filtersForm.classList.remove('hidden');
   }
+
   /**
    * Добавляет класс ошибки контейнеру с фото. Используется в случае
    * если произошла ошибка загрузки фото или загрузка прервалась
