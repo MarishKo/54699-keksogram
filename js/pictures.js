@@ -21,9 +21,6 @@
    * @type {Element}
    */
   var picturesContainer = document.querySelector('.pictures');
-
-  //var currentPictures;
-  // var renderedPictures = [];
   /**
    * @type {number}
    */
@@ -49,14 +46,6 @@
    */
   var renderedViews = [];
   var renderedPictures = [];
-  function galleryArrayUrl(element) {
-    var photosLenght = element.length;
-    for (var i = 0; i < photosLenght; i++) {
-      if (element[i].url === url) {
-        gallery.setCurrentPhoto(i);
-      }
-    }
-  }
   /**
    * Выводит на страницу список фото постранично.
    * @param {number} pageNumber
@@ -76,7 +65,7 @@
       }
     }
 
-    photosCollection.slice(picturesFrom, picturesTo).forEach(function(model) {
+    photosCollection.slice(picturesFrom, picturesTo).forEach(function(model, i) {
       var view = new PhotoView({ model: model });
       view.render();
       fragment.appendChild(view.el);
@@ -84,7 +73,7 @@
       renderedPictures.push(view.model.get('url'));
       view.on('galleryclick', function() {
         gallery.setPhotos(renderedPictures);
-        gallery.setCurrentPhoto(0);
+        gallery.setCurrentPhoto(i);
         gallery.show();
       });
     });
@@ -140,6 +129,7 @@
   function setActiveFilter(filterID) {
     filterPictures(filterID);
     currentPage = 0;
+    renderedPictures = [];
     renderPictures(currentPage, true);
     if ((picturesContainer.offsetHeight - 20) < window.innerHeight) {
       checkNextPage();
@@ -220,16 +210,6 @@
       }
     });
   }
-
- /* function initGallery() {
-    window.addEventListener('galleryclick', function(evt) {
-      console.log(111);
-      evt.preventDefault();
-      galleryArrayUrl(evt, currentPictures);
-    });
-  }
- */
-
 
   photosCollection.fetch({ timeout: REQUEST_FAILURE_TIMEOUT }).success(function(loaded, state, jqXHR) {
     initiallyLoaded = jqXHR.responseJSON;

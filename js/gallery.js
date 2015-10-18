@@ -12,16 +12,6 @@
     'LEFT': 37,
     'RIGHT': 39
   };
- /* var Gallery = function() {
-    this._element = document.body.querySelector('.gallery-overlay');
-    this._closeButton = this._element.querySelector('.gallery-overlay-close');
-    this._pictureElement = this._element.querySelector('.gallery-overlay-preview');
-
-    this._currentPhoto = 0;
-    this._photos = [];
-    this._onCloseClick = this._onCloseClick.bind(this);
-    this._onKeyUp = this._onKeyUp.bind(this);
-  };*/
   /**
    * Конструктор объекта фотогалереи. Создает свойства, хранящие ссылки на элементы
    * галереи, служебные данные (номер показанной фотографии и список фотографий)
@@ -40,6 +30,15 @@
     this._onCloseClick = this._onCloseClick.bind(this);
     this._onKeyUp = this._onKeyUp.bind(this);
   };
+  /**
+   * Метод, "зажимающий" переданное значение value между значениями
+   * min и max. Возвращает value которое будет не меньше min
+   * и не больше max.
+   * @param {number} value
+   * @param {number} min
+   * @param {number} max
+   * @return {number}
+   */
   Gallery.prototype._clamp = function(value, min, max) {
     return Math.min(Math.max(value, min), max);
   };
@@ -63,19 +62,6 @@
     this._photos.reset();
     this._currentPhoto = 0;
   };
-
-/*
-  Gallery.prototype._showCurrentPhoto = function() {
-    this._pictureElement.innerHTML = '';
-    var imageElement = new Image();
-
-    imageElement.onload = function() {
-      this._pictureElement.appendChild(imageElement);
-    }.bind(this);
-
-
-    imageElement.src = this._photos[this._currentPhoto];
-  };*/
   /**
    * Приватный метод, показывающий текущую фотографию. Убирает предыдущюю
    * отрисованную фотографию, создает объект Image с src указанным
@@ -111,11 +97,10 @@
       });
     }));
   };
-  /*Gallery.prototype.setPhotos = function(photos) {
-    this._photos = photos.map(function(item) {
-      return item.url;
-    });
-  };*/
+  /**
+   * Проверяет установленный номер фотографии, которую нужно показать, входит ли он в интрвал не больше массива.
+   * @param {number} index
+   */
   Gallery.prototype._isPhotoInLimit = function(index) {
     return !(index < 0 || index > this._photos.length - 1);
   };
@@ -140,6 +125,10 @@
         break;
     }
   };
+  /**
+   * Устанавливает номер фотографии, которую нужно показать и показывает ее на странице.
+   * @param {number} index
+   */
   Gallery.prototype.setCurrentPhoto = function(index) {
     if (this._isPhotoInLimit(index)) {
       this._clamp(index, 0, this._photos.length - 1);
@@ -147,6 +136,6 @@
       this.show();
     }
   };
-
+// Экспорт конструктора Gallery в глобальную область видимости.
   window.Gallery = Gallery;
 })();

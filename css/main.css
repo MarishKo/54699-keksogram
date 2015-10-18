@@ -410,3 +410,6 @@ input[type=radio]:checked + .upload-filter-label {
 .invisible{
   visibility: hidden;
 }
+.picture-likes-liked {
+  opacity: 0.5;
+}
