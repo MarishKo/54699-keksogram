@@ -26,6 +26,7 @@
     this._pictureElement = this._element.querySelector('.gallery-overlay-preview');
 
     this._currentPhoto = 0;
+    this._renderedView = null;
 
     this._onCloseClick = this._onCloseClick.bind(this);
     this._onKeyUp = this._onKeyUp.bind(this);
@@ -59,8 +60,10 @@
     this._element.classList.add('invisible');
     this._closeButton.removeEventListener('click', this._onCloseClick);
     document.body.removeEventListener('keyup', this._onKeyUp);
-    this._photos.reset();
     this._currentPhoto = 0;
+
+    this._renderedView.remove();
+    this._renderedView = null;
   };
   /**
    * Приватный метод, показывающий текущую фотографию. Убирает предыдущюю
@@ -70,11 +73,13 @@
    * @private
    */
   Gallery.prototype._showCurrentPhoto = function() {
-    this._pictureElement.innerHTML = '';
+    // this._pictureElement.innerHTML = '';
 
-    var imageElement = new GalleryPicture({ model: this._photos.at(this._currentPhoto) });
-    imageElement.render();
-    this._pictureElement.appendChild(imageElement.el);
+    //
+    this._renderedView = new GalleryPicture({ model: this._photos.at(this._currentPhoto) });
+    this._renderedView.setElement(this._pictureElement);
+    this._renderedView.render();
+    // this._pictureElement.appendChild(imageElement.el);
   };
   /**
    * Обработчик события клика по крестику закрытия. Вызывает метод hide.
@@ -88,15 +93,12 @@
   };
   /**
    * Записывает список фотографий.
-   * @param {Array.<string>} photos
+   * @param {Backbone.Collection} photos
    */
   Gallery.prototype.setPhotos = function(photos) {
-    this._photos.reset(photos.map(function(photoSrc) {
-      return new Backbone.Model({
-        url: photoSrc
-      });
-    }));
+    this._photos = photos;
   };
+
   /**
    * Проверяет установленный номер фотографии, которую нужно показать, входит ли он в интрвал не больше массива.
    * @param {number} index
@@ -104,6 +106,7 @@
   Gallery.prototype._isPhotoInLimit = function(index) {
     return !(index < 0 || index > this._photos.length - 1);
   };
+
   /**
    * Обработчик клавиатурных событий. Прячет галерею при нажатии Esc
    * и переключает фотографии при нажатии на стрелки.
@@ -133,7 +136,7 @@
     if (this._isPhotoInLimit(index)) {
       this._clamp(index, 0, this._photos.length - 1);
       this._currentPhoto = index;
-      this.show();
+      this._showCurrentPhoto();
     }
   };
 // Экспорт конструктора Gallery в глобальную область видимости.

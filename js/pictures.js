@@ -47,16 +47,6 @@
   var renderedViews = [];
   var renderedPictures = [];
 
-  //Функция,проверяющая при клике, совпадает ли url элемента,по которому кликают с url элемента в массиве. если они совпадают
-  //вызывается gallery.setCurrentPhoto
-  function galleryArrayUrl(element, url) {
-    var photosLenght = element.length;
-    for (var i = 0; i < photosLenght; i++) {
-      if (element[i] === url) {
-        gallery.setCurrentPhoto(i);
-      }
-    }
-  }
   /**
    * Выводит на страницу список фото постранично.
    * @param {number} pageNumber
@@ -83,8 +73,11 @@
       renderedViews.push(view);
       renderedPictures.push(view.model.get('url'));
       view.on('galleryclick', function() {
-        gallery.setPhotos(renderedPictures);
-        galleryArrayUrl(renderedPictures, view.model.get('url'));
+        // NB! Вот этот код фактически вызывал Gallery.show() дважды, потому что
+        // galleryArrayUrl вызывает setCurrentPhoto, который
+        //galleryArrayUrl(renderedPictures, view.model.get('url'));
+
+        gallery.setCurrentPhoto(photosCollection.models.indexOf(view.model));
         gallery.show();
       });
     });
@@ -140,6 +133,7 @@
    */
   function setActiveFilter(filterID) {
     filterPictures(filterID);
+    gallery.setPhotos(photosCollection);
     currentPage = 0;
     renderedPictures = [];
     renderPictures(currentPage, true);
@@ -214,15 +208,32 @@
    */
   function initFilters() {
     var filtersContainer = document.querySelector('.filters');
+    var filterChecked = document.querySelector('#' + localStorage.getItem('filterID')) ||
+      document.querySelector('.filters-radio:checked');
     filtersContainer.addEventListener('click', function(evt) {
       var clickedFilter = evt.target;
-
-      if (doesHaveParent(clickedFilter, 'filters-radio')) {
+      if (doesHaveParent(clickedFilter, 'filters-radio') && (filterChecked.id !== clickedFilter.id)) {
         setActiveFilter(clickedFilter.id);
+        filterChecked = clickedFilter;
       }
     });
   }
+/*  function initFilters() {
+ var filterElements = document.querySelectorAll('.filters-radio');
+ var filterChecked = document.querySelector('#' + localStorage.getItem('filterID')) ||
+ document.querySelector('.filters-radio:checked');
 
+ for (var i = 0, l = filterElements.length; i < l; i++) {
+ filterElements[i].addEventListener('click', function(evt) {
+ var clickedFilter = evt.currentTarget;
+ if (filterChecked !== clickedFilter) {
+ setActiveFilter(clickedFilter.id);
+ filterChecked = clickedFilter;
+ }
+ clickedFilter.checked = true;
+ });
+ }
+ }*/
   photosCollection.fetch({ timeout: REQUEST_FAILURE_TIMEOUT }).success(function(loaded, state, jqXHR) {
     initiallyLoaded = jqXHR.responseJSON;
     initFilters();

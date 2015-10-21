@@ -24,10 +24,7 @@
     initialize: function() {
       this._onImageLoad = this._onImageLoad.bind(this);
       this._onImageFail = this._onImageFail.bind(this);
-      this._onModelLike = this._onModelLike.bind(this);
       this._onClick = this._onClick.bind(this);
-
-      this.model.on('change:liked', this._onModelLike);
     },
 
     /**
@@ -62,7 +59,6 @@
 
         this._pictureBackground.src = this.model.get('url');
       }
-      this._updateLike();
     },
 
     /**
@@ -72,17 +68,7 @@
      */
     _onClick: function(evt) {
       evt.preventDefault();
-      if (this.el.classList.contains('picture') && !this.el.classList.contains('picture-load-failure')) {
-        this.trigger('galleryclick');
-      }
-      // Клик по иконке сердца, добавляет лайк к фото
-      if (evt.target.classList.contains('picture-likes')) {
-        if (this.model.get('liked')) {
-          this.model.dislike();
-        } else {
-          this.model.like();
-        }
-      }
+      this.trigger('galleryclick');
     },
 
     /**
@@ -102,21 +88,7 @@
       //failedImage.src = 'failed.jpg';
       this.el.classList.add('picture-load-failure');
     },
-    /**
-     * @private
-     */
-    _onModelLike: function() {
-      this._updateLike();
-    },
-    /**
-     * @private
-     */
-    _updateLike: function() {
-      var likeButton = this.el.querySelector('.picture-likes');
-      if (likeButton) {
-        likeButton.classList.toggle('picture-likes-liked', this.model.get('liked'));
-      }
-    },
+
     /**
      * Удаление обработчиков событий на элементе.
      * @param {Image} image
