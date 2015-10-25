@@ -8,17 +8,17 @@
   var PhotoModel = Backbone.Model.extend({
     /** @override */
     initialize: function() {
-      this.set('liked', false);
+      this.attributes.liked = false;
     },
 
     like: function() {
-      this.set('liked', true);
       this.set('likes', this.get('likes') + 1);
+      this.set('liked', true);
     },
 
     dislike: function() {
-      this.set('liked', false);
       this.set('likes', this.get('likes') - 1);
+      this.set('liked', false);
     }
   });
 

@@ -1,3 +1,4 @@
+/* global resizer: true */
 'use strict';
 
 (function() {
@@ -7,58 +8,62 @@
 
   var previewImage = resizeForm.querySelector('.resize-image-preview');
   var prevButton = resizeForm['resize-prev'];
-
   var resizeX = resizeForm['resize-x'];
   var resizeY = resizeForm['resize-y'];
   var resizeSize = resizeForm['resize-size'];
-
+//начальные значения полей
   resizeX.value = 0;
   resizeY.value = 0;
   resizeSize.value = 50;
-
+//минимальные значения смещений и стороны квадрата
   resizeX.min = 0;
   resizeY.min = 0;
   resizeSize.min = 1;
 
+// Установка максимального значения смещений
   function setResizeShift() {
     resizeX.max = Math.max( (parseInt(previewImage.naturalWidth, 10) - parseInt(resizeSize.value, 10)), 0);
     resizeY.max = Math.max( (parseInt(previewImage.naturalHeight, 10) - parseInt(resizeSize.value, 10)), 0);
-
-    if (resizeX.value > resizeX.max) {
-      resizeX.value = resizeX.max;
-    }
-    if (resizeY.value > resizeY.max) {
-      resizeY.value = resizeY.max;
-    }
+    resizer.setConstraint(parseInt(resizeX.value, 10), parseInt(resizeY.value, 10), parseInt(resizeSize.value, 10));
   }
-  function setSide() {
-    if (previewImage.naturalWidth > previewImage.naturalHeight) {
-      resizeSize.max = Math.min(previewImage.naturalHeight - parseInt(resizeX.value, 10), previewImage.naturalHeight - parseInt(resizeY.value, 10));
-    }
-    resizeSize.max = Math.min(previewImage.naturalWidth - parseInt(resizeX.value, 10), previewImage.naturalWidth - parseInt(resizeY.value, 10));
-
-    if (resizeSize.value > resizeSize.max) {
-      resizeSize.value = Math.max(resizeSize.max, resizeSize.min);
-    }
-  }
-
+  // Проверка, валидны ли значения смешений.
   function displacementIsValid() {
     if (!resizeX.max || !resizeY.max) {
       setResizeShift();
     }
     return resizeX.value <= resizeX.max && resizeY.value <= resizeY.max;
   }
+  // Установка максимального значения стороны. Размер картинки минус смещение.
+  function setSide() {
+    //var resizeMaxWidth = Math.min(previewImage.naturalHeight - parseInt(resizeX.value, 10), previewImage.naturalHeight - parseInt(resizeY.value, 10));
+    //var resizeMaxHeight = Math.min(previewImage.naturalWidth - parseInt(resizeX.value, 10), previewImage.naturalWidth - parseInt(resizeY.value, 10));
+    //resizeSize.max = Math.min(resizeMaxWidth, resizeMaxHeight);
+
+  }
+  // Проверка, валиден ли размер стороны
   function sideIsValid() {
     if (!resizeSize.max) {
       setSide();
     }
     return resizeSize.value <= resizeSize.max;
   }
+  // Обработчик изменения смещения по Х, устанавливает максимальное
+  // значение стороны.
   resizeX.onchange = function() {
-    setResizeShift();
+    if (!resizeX.max) {
+      resizer.setPaddings(parseInt(resizeX.value, 10), parseInt(resizeY.value, 10));
+      setResizeShift();
+    }
+    setSide();
   };
+  // Обработчик изменения смещения по Y, устанавливает максимальное
+  // значение стороны.
   resizeY.onchange = function() {
-    setResizeShift();
+    if (!resizeY.max) {
+      resizer.setPaddings(parseInt(resizeX.value, 10), parseInt(resizeY.value, 10));
+      setResizeShift();
+    }
+    setSide();
   };
   resizeSize.onchange = function() {
     if (!resizeSize.max) {
@@ -74,6 +79,11 @@
     resizeForm.classList.add('invisible');
     uploadForm.classList.remove('invisible');
   };
+  if (sideIsValid() && displacementIsValid()) {
+    window.addEventListener('resizerchange', function() {
+      //resizer.moveConstraint(parseInt(resizeX.value, 10), parseInt(resizeY.value, 10), parseInt(resizeSize.value, 10));
+    });
+  }
   resizeForm.onsubmit = function(evt) {
     evt.preventDefault();
     if (sideIsValid() && displacementIsValid()) {

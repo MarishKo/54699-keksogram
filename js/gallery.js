@@ -45,13 +45,12 @@
   };
   /**
    * Показывает фотогалерею, убирая у контейнера класс hidden. Затем добавляет
-   * обработчики событий и показывает текущую фотографию.
+   * обработчики событий.
    */
   Gallery.prototype.show = function() {
     this._element.classList.remove('invisible');
     this._closeButton.addEventListener('click', this._onCloseClick);
     document.body.addEventListener('keyup', this._onKeyUp);
-    this._showCurrentPhoto();
   };
   /**
    * Убирает фотогалерею и обработчики событий. Очищает служебные свойства.
@@ -73,13 +72,9 @@
    * @private
    */
   Gallery.prototype._showCurrentPhoto = function() {
-    // this._pictureElement.innerHTML = '';
-
-    //
     this._renderedView = new GalleryPicture({ model: this._photos.at(this._currentPhoto) });
     this._renderedView.setElement(this._pictureElement);
     this._renderedView.render();
-    // this._pictureElement.appendChild(imageElement.el);
   };
   /**
    * Обработчик события клика по крестику закрытия. Вызывает метод hide.
@@ -135,6 +130,10 @@
   Gallery.prototype.setCurrentPhoto = function(index) {
     if (this._isPhotoInLimit(index)) {
       this._clamp(index, 0, this._photos.length - 1);
+      if (this._renderedView) {
+        this._renderedView.remove();
+      }
+
       this._currentPhoto = index;
       this._showCurrentPhoto();
     }

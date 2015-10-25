@@ -73,10 +73,6 @@
       renderedViews.push(view);
       renderedPictures.push(view.model.get('url'));
       view.on('galleryclick', function() {
-        // NB! Вот этот код фактически вызывал Gallery.show() дважды, потому что
-        // galleryArrayUrl вызывает setCurrentPhoto, который
-        //galleryArrayUrl(renderedPictures, view.model.get('url'));
-
         gallery.setCurrentPhoto(photosCollection.models.indexOf(view.model));
         gallery.show();
       });
@@ -193,10 +189,9 @@
       if (element.classList.contains(className)) {
         return true;
       }
-
       element = element.parentElement;
-    } while (element);
-
+    }
+    while (element);
     return false;
   }
   /**
@@ -218,22 +213,6 @@
       }
     });
   }
-/*  function initFilters() {
- var filterElements = document.querySelectorAll('.filters-radio');
- var filterChecked = document.querySelector('#' + localStorage.getItem('filterID')) ||
- document.querySelector('.filters-radio:checked');
-
- for (var i = 0, l = filterElements.length; i < l; i++) {
- filterElements[i].addEventListener('click', function(evt) {
- var clickedFilter = evt.currentTarget;
- if (filterChecked !== clickedFilter) {
- setActiveFilter(clickedFilter.id);
- filterChecked = clickedFilter;
- }
- clickedFilter.checked = true;
- });
- }
- }*/
   photosCollection.fetch({ timeout: REQUEST_FAILURE_TIMEOUT }).success(function(loaded, state, jqXHR) {
     initiallyLoaded = jqXHR.responseJSON;
     initFilters();

@@ -36,6 +36,7 @@
         this._likeButton.classList.toggle('likes-count-liked', this.model.get('liked'));
         this._likeButton.innerText = this.model.get('likes');
       }
+
     },
 
     _onButtonClick: function() {

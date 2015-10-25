@@ -20,7 +20,6 @@
       // для удобства работы с координатами.
       this._container.width = this._image.naturalWidth;
       this._container.height = this._image.naturalHeight;
-
       /**
        * Предлагаемый размер кадра в виде коэффициента относительно меньшей
        * стороны изображения.
@@ -32,16 +31,16 @@
       var side = Math.min(
           this._container.width * INITIAL_SIDE_RATIO,
           this._container.height * INITIAL_SIDE_RATIO);
-
       // Изначально предлагаемое кадрирование — часть по центру с размером в 3/4
       // от размера меньшей стороны.
       this._resizeConstraint = new Square(
           this._container.width / 2 - side / 2,
           this._container.height / 2 - side / 2,
           side);
-
+      this.setConstraint(0, 0, 50);
       // Отрисовка изначального состояния канваса.
       this.redraw();
+      window.dispatchEvent(new CustomEvent('imageonload'));
     }.bind(this);
 
     // Фиксирование контекста обработчиков.
@@ -75,7 +74,11 @@
      */
     _resizeConstraint: null,
 
-    /**
+    _topPadding: 0,
+
+    _leftPadding: 0,
+
+  /**
      * Отрисовка канваса.
      */
     redraw: function() {
@@ -88,7 +91,6 @@
 
       // Установка начальной точки системы координат в центр холста.
       this._ctx.translate(this._container.width / 2, this._container.height / 2);
-
       var displX = -(this._resizeConstraint.x + this._resizeConstraint.side / 2);
       var displY = -(this._resizeConstraint.y + this._resizeConstraint.side / 2);
       // Отрисовка изображения на холсте. Параметры задают изображение, которое
@@ -100,6 +102,10 @@
       // кадрирования. Координаты задаются от центра.
       //
 
+      this._ctx.strokeStyle = '#FFE753';
+      this._ctx.lineWidth = 6;
+      this._ctx.setLineDash([15, 10]);
+      this._ctx.strokeRect(-this._container.width / 2 + this._leftPadding, -this._container.height / 2 + this._topPadding, this._resizeConstraint.side, this._resizeConstraint.side);
       // Восстановление состояния канваса, которое было до вызова ctx.save
       // и последующего изменения системы координат. Нужно для того, чтобы
       // следующий кадр рисовался с привычной системой координат, где точка
@@ -107,7 +113,20 @@
       // некорректно сработает даже очистка холста или нужно будет использовать
       // сложные рассчеты для координат прямоугольника, который нужно очистить.
       this._ctx.restore();
+
+
     },
+    /**
+     * Смещение от верхнего края и от левого края.
+     * @param {number} x
+     * @param {number} y
+     */
+
+    setPaddings: function(x, y) {
+      this._topPadding = y;
+      this._leftPadding = x;
+    },
+
 
     /**
      * Включение режима перемещения. Запоминается текущее положение курсора,
@@ -224,7 +243,6 @@
       if (typeof side !== 'undefined') {
         this._resizeConstraint.side = side;
       }
-
       requestAnimationFrame(function() {
         this.redraw();
         window.dispatchEvent(new CustomEvent('resizerchange'));
@@ -275,6 +293,8 @@
       return imageToExport;
     }
   };
+
+
 
   /**
    * Вспомогательный тип, описывающий квадрат.

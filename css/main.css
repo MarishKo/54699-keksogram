@@ -440,7 +440,7 @@ input[type=radio]:checked + .upload-filter-label {
 }
 
 .likes-count {
-  cursor: pointre;
+  cursor: pointer;
 }
 
 .likes-count:before {
@@ -455,11 +455,6 @@ input[type=radio]:checked + .upload-filter-label {
 }
 
 .likes-count-liked:before {
-  background-position-x: -18px;
+  background-position: -18px 0px;
 }
-.invisible{
-  visibility: hidden;
-}
-.picture-likes-liked {
-  opacity: 0.5;
-}
+
