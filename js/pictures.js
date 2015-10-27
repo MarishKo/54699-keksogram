@@ -1,9 +1,20 @@
-/* global Gallery: true PhotosCollection: true PhotoView: true*/
-
+/*global resizer: true*/
 'use strict';
 
-(function() {
+requirejs.config({
+  baseUrl: 'js'
+});
 
+define([
+  'gallery',
+  'models/photos',
+  'views/photo',
+  //'resize-picture',
+  'resize-form',
+  'upload-form',
+  'filter-form',
+  'logo-background'
+], function(Gallery, PhotosCollection, PhotoView) {
   var filtersForm = document.querySelector('.filters');
   filtersForm.classList.add('hidden');
   /**
@@ -25,7 +36,6 @@
    * @type {number}
    */
   var currentPage = 0;
-
   /**
    * Объект типа фотогалерея.
    * @type {Gallery}
@@ -120,7 +130,21 @@
         break;
     }
     photosCollection.reset(filteredPictures);
-    localStorage.setItem('filterID', filterID);
+    location.hash = 'filters/' + filterID;
+  }
+  window.addEventListener('hashchange', parseURL());
+
+  function parseURL() {
+    if (!location.hash.match(/^#filters\/(\S+)$/)) {
+      setActiveFilter('filter-popular');
+    }
+    if (location.hash.match(/^#filters\/(\S+)$/)) {
+      var arr = location.hash.match(/^#filters\/(\S+)$/);
+      var filterID = arr[1];
+      setActiveFilter(filterID);
+      var checkedFilter = document.getElementById(filterID);
+      checkedFilter.checked = true;
+    }
   }
   /**
    * Вызывает функцию фильтрации на списке отелей с переданным fitlerID
@@ -203,7 +227,11 @@
    */
   function initFilters() {
     var filtersContainer = document.querySelector('.filters');
-    var filterChecked = document.querySelector('#' + localStorage.getItem('filterID')) ||
+    if (location.hash.match(/^#filters\/(\S+)$/)) {
+      var arr = location.hash.match(/^#filters\/(\S+)$/);
+      var filterID = arr[1];
+    }
+    var filterChecked = document.querySelector('#' + filterID) ||
       document.querySelector('.filters-radio:checked');
     filtersContainer.addEventListener('click', function(evt) {
       var clickedFilter = evt.target;
@@ -213,15 +241,14 @@
       }
     });
   }
+
   photosCollection.fetch({ timeout: REQUEST_FAILURE_TIMEOUT }).success(function(loaded, state, jqXHR) {
     initiallyLoaded = jqXHR.responseJSON;
     initFilters();
     initScroll();
+    parseURL();
 
-    setActiveFilter(localStorage.getItem('filterID') || 'filter-popular');
-    var checkedFilter = document.getElementById(localStorage.getItem('filterID'));
-    checkedFilter.checked = true;
   }).fail(function() {
     showLoadFailure();
   });
-})();
+});

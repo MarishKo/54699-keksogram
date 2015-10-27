@@ -1,7 +1,7 @@
-/* global resizer: true */
+/*global resizer: true*/
 'use strict';
 
-(function() {
+define(function() {
   var uploadForm = document.forms['upload-select-image'];
   var resizeForm = document.forms['upload-resize'];
   var filterForm = document.forms['upload-filter'];
@@ -91,4 +91,4 @@
     }
   };
 
-})();
+});

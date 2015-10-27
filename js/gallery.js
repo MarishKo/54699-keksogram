@@ -1,7 +1,8 @@
-/* global GalleryPicture: true */
 'use strict';
 
-(function() {
+define([
+  'views/photo-preview'
+], function(GalleryPicture) {
   /**
    * Список констант кодов нажатых клавиш для обработки
    * клавиатурных событий.
@@ -138,6 +139,5 @@
       this._showCurrentPhoto();
     }
   };
-// Экспорт конструктора Gallery в глобальную область видимости.
-  window.Gallery = Gallery;
-})();
+  return Gallery;
+});

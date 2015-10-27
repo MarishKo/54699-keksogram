@@ -10,4 +10,4 @@
   var backgroundElement = document.querySelector('.upload');
   var randomImageNumber = Math.round(Math.random() * (images.length - 1));
   backgroundElement.style.backgroundImage = 'url(' + images[randomImageNumber] + ')';
-})();
+});

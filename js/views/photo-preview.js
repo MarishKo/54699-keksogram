@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+define(function() {
   var GalleryPicture = Backbone.View.extend({
     initialize: function() {
       // Фиксирование контекста обработчика клика по лайку.
@@ -49,5 +49,5 @@
     }
   });
 
-  window.GalleryPicture = GalleryPicture;
-})();
+  return GalleryPicture;
+});

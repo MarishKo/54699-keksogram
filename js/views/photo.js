@@ -1,8 +1,6 @@
-/* global Backbone: true */
-
 'use strict';
 
-(function() {
+define(function() {
   /**
    * @const
    * @type {number}
@@ -85,7 +83,6 @@
      * @private
      */
     _onImageFail: function() {
-      //failedImage.src = 'failed.jpg';
       this.el.classList.add('picture-load-failure');
     },
 
@@ -100,6 +97,5 @@
       image.removeEventListener('abort', this._onImageFail);
     }
   });
-
-  window.PhotoView = PhotoView;
-})();
+  return PhotoView;
+});
