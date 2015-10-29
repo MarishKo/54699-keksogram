@@ -19,7 +19,6 @@ define(function() {
     createVideoElement: function() {
       this._thisVideo = document.createElement('video');
       //запись аттрибутов видео
-      //thisVideo.setAttribute('autoplay', 'true');
       this._thisVideo.setAttribute('loop', 'true');
       this._thisVideo.setAttribute('poster', this.model.get('preview'));
       this._thisVideo.classList.add('video');
@@ -41,7 +40,7 @@ define(function() {
       this.el.querySelector('.gallery-overlay-image').classList.add('invisible');
       this._thisVideo.classList.remove('invisible');
       // Запись количества комментов в блоке под видео.
-      this.el.querySelector('.comments-count').innerText = this.model.get('comments');
+      this.el.querySelector('.comments-count').innerHTML = this.model.get('comments');
 
       // Сохранение кнопки лайка
       this._likeButton = this.el.querySelector('.likes-count');
@@ -56,13 +55,14 @@ define(function() {
     },
 
     remove: function() {
+      this._pauseVideo();
       this._likeButton.removeEventListener('click', this._onButtonClick);
     },
 
     _updateLikeButton: function() {
       if (this._likeButton) {
         this._likeButton.classList.toggle('likes-count-liked', this.model.get('liked'));
-        this._likeButton.innerText = this.model.get('likes');
+        this._likeButton.innerHTML = this.model.get('likes');
       }
 
     },

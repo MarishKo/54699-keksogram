@@ -123,6 +123,7 @@ define([
     switch (evt.keyCode) {
       case Key.ESC:
         this.hide();
+
         break;
 
       case Key.LEFT:

@@ -20,7 +20,7 @@ define(function() {
       // Подстановка картинки.
       this.el.querySelector('.gallery-overlay-image').src = this.model.get('url');
       // Запись количества комментов в блоке под фотографией.
-      this.el.querySelector('.comments-count').innerText = this.model.get('comments');
+      this.el.querySelector('.comments-count').innerHTML = this.model.get('comments');
 
       // Сохранение кнопки лайка
       this._likeButton = this.el.querySelector('.likes-count');
@@ -38,7 +38,7 @@ define(function() {
     _updateLikeButton: function() {
       if (this._likeButton) {
         this._likeButton.classList.toggle('likes-count-liked', this.model.get('liked'));
-        this._likeButton.innerText = this.model.get('likes');
+        this._likeButton.innerHTML = this.model.get('likes');
       }
     },
 
