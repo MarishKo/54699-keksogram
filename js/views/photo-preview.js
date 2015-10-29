@@ -13,12 +13,15 @@ define(function() {
     },
 
     render: function() {
-      if (this.el.querySelector('.video')) {
-        this.el.querySelector('.video').classList.add('invisible');
+      var videoElement = this.el.querySelector('.video');
+      var imgElement = this.el.querySelector('.gallery-overlay-image');
+
+      if (videoElement) {
+        videoElement.classList.add('invisible');
       }
-      this.el.querySelector('.gallery-overlay-image').classList.remove('invisible');
+      imgElement.classList.remove('invisible');
       // Подстановка картинки.
-      this.el.querySelector('.gallery-overlay-image').src = this.model.get('url');
+      imgElement.src = this.model.get('url');
       // Запись количества комментов в блоке под фотографией.
       this.el.querySelector('.comments-count').innerHTML = this.model.get('comments');
 

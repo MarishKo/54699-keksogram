@@ -63,9 +63,17 @@ define([
     document.body.removeEventListener('keyup', this._onKeyUp);
     this._currentPhoto = 0;
 
-    this._renderedView.remove();
-    this._renderedView = null;
+    this.removeView();
   };
+
+
+  Gallery.prototype.removeView = function() {
+    if (this._renderedView) {
+      this._renderedView.remove();
+      this._renderedView = null;
+    }
+  };
+
   /**
    * Приватный метод, показывающий текущую фотографию. Убирает предыдущюю
    * отрисованную фотографию, создает объект Image с src указанным
@@ -74,6 +82,8 @@ define([
    * @private
    */
   Gallery.prototype._showCurrentPhoto = function() {
+    this.removeView();
+
     this._renderedView = new GalleryPicture({ model: this._photos.at(this._currentPhoto) });
     this._renderedView.setElement(this._pictureElement);
     this._renderedView.render();
@@ -83,6 +93,8 @@ define([
    * @private
    */
   Gallery.prototype._showCurrentVideo = function() {
+    this.removeView();
+
     this._renderedView = new GalleryVideo({ model: this._photos.at(this._currentPhoto) });
     this._renderedView.setElement(this._pictureElement);
     this._renderedView.render();
@@ -103,14 +115,6 @@ define([
    */
   Gallery.prototype.setPhotos = function(photos) {
     this._photos = photos;
-  };
-
-  /**
-   * Проверяет установленный номер фотографии, которую нужно показать, входит ли он в интрвал не больше массива.
-   * @param {number} index
-   */
-  Gallery.prototype._isPhotoInLimit = function(index) {
-    return !(index < 0 || index > this._photos.length - 1);
   };
 
   /**
@@ -140,12 +144,12 @@ define([
    * @param {number} index
    */
   Gallery.prototype.setCurrentPhoto = function(index) {
-    if (this._isPhotoInLimit(index)) {
-      this._clamp(index, 0, this._photos.length - 1);
-      if (this._renderedView) {
-        this._renderedView.remove();
-      }
-      this._currentPhoto = index;
+    if (this._renderedView) {
+      this._renderedView.remove();
+    }
+    this._currentPhoto = this._clamp(index, 0, this._photos.length - 1);
+
+    if (this._photos.models[index]) {
       if (this._photos.models[index].attributes['preview']) {
         //вызов галереи для видео
         this._showCurrentVideo();

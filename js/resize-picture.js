@@ -3,7 +3,7 @@
 define(function() {
   /**
    * @constructor
-   * @param {FileBuffer}
+   * @param {FileBuffer} image
    */
   var Resizer = function(image) {
     // Изображение, с которым будет вестись работа.

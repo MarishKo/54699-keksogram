@@ -11,9 +11,7 @@ define(function() {
         this._updateLikeButton();
       }.bind(this));
       //Подписка на запуск видео по клику
-      this._playVideo = this._playVideo.bind(this);
-      //Подписка на паузу видео по клику после play
-      this._pauseVideo = this._pauseVideo.bind(this);
+      this._toggleVideo = this._toggleVideo.bind(this);
     },
 
     createVideoElement: function() {
@@ -47,7 +45,7 @@ define(function() {
       // Обработчик клика по кнопке лайка
       this._likeButton.addEventListener('click', this._onButtonClick);
       //Обработчик клика на запуск видео по клику по видео
-      this._thisVideo.addEventListener('click', this._playVideo);
+      this._thisVideo.addEventListener('click', this._toggleVideo);
 
       // Обновление статуса кнопки лайка — количества лайков и класса,
       // показывающего сердечко.
@@ -55,7 +53,7 @@ define(function() {
     },
 
     remove: function() {
-      this._pauseVideo();
+      this._toggleVideo();
       this._likeButton.removeEventListener('click', this._onButtonClick);
     },
 
@@ -75,21 +73,12 @@ define(function() {
         this.model.like();
       }
     },
-    _playVideo: function() {
-      this._thisVideo.play();
-      if (this._thisVideo.played) {
-      //Обработчик клика на запуск видео по клику по видео
-        this._thisVideo.addEventListener('click', this._pauseVideo);
-        this._thisVideo.removeEventListener('click', this._playVideo);
-      }
 
-    },
-    _pauseVideo: function() {
-      this._thisVideo.pause();
+    _toggleVideo: function() {
       if (this._thisVideo.paused) {
-        this._thisVideo.removeEventListener('click', this._pauseVideo);
-        //Обработчик клика на запуск видео по клику по видео
-        this._thisVideo.addEventListener('click', this._playVideo);
+        this._thisVideo.play();
+      } else {
+        this._thisVideo.pause();
       }
     }
   });

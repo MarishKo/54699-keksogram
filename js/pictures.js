@@ -26,6 +26,13 @@ define([
    * @type {number}
    */
   var PAGE_SIZE = 12;
+
+  /**
+   * @const
+   * @type {number}
+   */
+  var GAP = 20;
+
   /**
    * Контейнер списка фотографий.
    * @type {Element}
@@ -142,15 +149,13 @@ define([
    */
   function parseURL() {
     var hashCompare = hashMatch();
-    if (!hashCompare) {
-      setActiveFilter('filter-popular');
-    }
     if (hashCompare) {
-      var arr = hashCompare;
-      var filterID = arr[1];
+      var filterID = hashCompare[1];
       setActiveFilter(filterID);
       var checkedFilter = document.getElementById(filterID);
       checkedFilter.checked = true;
+    } else {
+      setActiveFilter('filter-popular');
     }
   }
   /**
@@ -179,7 +184,6 @@ define([
    * @return {boolean}
    */
   function isAtTheBottom() {
-    var GAP = 20;
     return picturesContainer.getBoundingClientRect().bottom - GAP <= window.innerHeight;
   }
   /**
@@ -233,17 +237,13 @@ define([
    */
   function initFilters() {
     var filtersContainer = document.querySelector('.filters');
-    if (hashMatch()) {
-      var arr = hashMatch();
-      var filterID = arr[1];
-    }
-    var filterChecked = document.querySelector('#' + filterID) ||
+    var filterChecked = document.querySelector('#' + hashMatch()[1]) ||
       document.querySelector('.filters-radio:checked');
+
     filtersContainer.addEventListener('click', function(evt) {
       var clickedFilter = evt.target;
       if (doesHaveParent(clickedFilter, 'filters-radio') && (filterChecked.id !== clickedFilter.id)) {
         setActiveFilter(clickedFilter.id);
-        filterChecked = clickedFilter;
       }
     });
   }

@@ -20,9 +20,7 @@ define(function() {
   resizeY.min = 0;
   resizeSize.min = 1;
   window.addEventListener('imageonload', function() {
-    var resizeMaxWidth = Math.min(previewImage.height - parseInt(resizeX.value, 10), previewImage.height - parseInt(resizeY.value, 10));
-    var resizeMaxHeight = Math.min(parseInt(previewImage.width, 10) - parseInt(resizeX.value, 10), previewImage.width - parseInt(resizeY.value, 10));
-    resizeSize.max = Math.min(resizeMaxWidth, resizeMaxHeight);
+    setSide();
   });
 // Установка максимального значения смещений
   function setResizeShift() {
@@ -50,17 +48,20 @@ define(function() {
     }
     return parseInt(resizeSize.value, 10) <= parseInt(resizeSize.max, 10);
   }
-  // Обработчик изменения смещения по Х
-  resizeX.onchange = function() {
+
+  function onPaddingChange() {
     resizer.setPaddings(parseInt(resizeX.value, 10), parseInt(resizeY.value, 10));
     setResizeShift();
     setSide();
+  }
+
+  // Обработчик изменения смещения по Х
+  resizeX.onchange = function() {
+    onPaddingChange();
   };
   // Обработчик изменения смещения по Y
   resizeY.onchange = function() {
-    resizer.setPaddings(parseInt(resizeX.value, 10), parseInt(resizeY.value, 10));
-    setResizeShift();
-    setSide();
+    onPaddingChange();
   };
   resizeSize.onchange = function() {
     if (!resizeSize.max) {
