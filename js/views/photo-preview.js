@@ -13,6 +13,10 @@ define(function() {
     },
 
     render: function() {
+      if (this.el.querySelector('.video')) {
+        this.el.querySelector('.video').classList.add('invisible');
+      }
+      this.el.querySelector('.gallery-overlay-image').classList.remove('invisible');
       // Подстановка картинки.
       this.el.querySelector('.gallery-overlay-image').src = this.model.get('url');
       // Запись количества комментов в блоке под фотографией.
@@ -36,7 +40,6 @@ define(function() {
         this._likeButton.classList.toggle('likes-count-liked', this.model.get('liked'));
         this._likeButton.innerText = this.model.get('likes');
       }
-
     },
 
     _onButtonClick: function() {

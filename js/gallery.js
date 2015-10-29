@@ -1,8 +1,9 @@
 'use strict';
 
 define([
-  'views/photo-preview'
-], function(GalleryPicture) {
+  'views/photo-preview',
+  'views/video-preview'
+], function(GalleryPicture, GalleryVideo) {
   /**
    * Список констант кодов нажатых клавиш для обработки
    * клавиатурных событий.
@@ -78,6 +79,15 @@ define([
     this._renderedView.render();
   };
   /**
+   * Приватный метод, показывающий текущее видео.
+   * @private
+   */
+  Gallery.prototype._showCurrentVideo = function() {
+    this._renderedView = new GalleryVideo({ model: this._photos.at(this._currentPhoto) });
+    this._renderedView.setElement(this._pictureElement);
+    this._renderedView.render();
+  };
+  /**
    * Обработчик события клика по крестику закрытия. Вызывает метод hide.
    * @param {Event} evt
    * @private
@@ -134,9 +144,14 @@ define([
       if (this._renderedView) {
         this._renderedView.remove();
       }
-
       this._currentPhoto = index;
-      this._showCurrentPhoto();
+      if (this._photos.models[index].attributes['preview']) {
+        //вызов галереи для видео
+        this._showCurrentVideo();
+      } else {
+        //вызов галлереи для фото
+        this._showCurrentPhoto();
+      }
     }
   };
   return Gallery;

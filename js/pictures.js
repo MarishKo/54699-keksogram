@@ -9,7 +9,6 @@ define([
   'gallery',
   'models/photos',
   'views/photo',
-  //'resize-picture',
   'resize-form',
   'upload-form',
   'filter-form',
@@ -104,7 +103,7 @@ define([
    * Фильтрация списка фото. Принимает на вход список фото
    * и ID фильтра. В зависимости от переданного ID применяет
    * разные алгоритмы фильтрации. Возвращает отфильтрованный
-   * список и записывает примененный фильтр в localStorage.
+   * список и записывает примененный фильтр в hash.
    * Не изменяет исходный массив.
    * @param {string} filterID
    * @return {Array.<Object>}
@@ -132,14 +131,21 @@ define([
     photosCollection.reset(filteredPictures);
     location.hash = 'filters/' + filterID;
   }
-  window.addEventListener('hashchange', parseURL());
 
+  function hashMatch() {
+    return location.hash.match(/^#filters\/(\S+)$/);
+  }
+  /**
+   * функция parseURL, которая с помощью регулярного выражения обрабатывает хэш адресной строки
+   * и если он соответствует паттерну filters/символы,
+   *запускает фильтрацию с аргументом находящимся в хэше после filters/
+   */
   function parseURL() {
-    if (!location.hash.match(/^#filters\/(\S+)$/)) {
+    if (!hashMatch()) {
       setActiveFilter('filter-popular');
     }
-    if (location.hash.match(/^#filters\/(\S+)$/)) {
-      var arr = location.hash.match(/^#filters\/(\S+)$/);
+    if (hashMatch()) {
+      var arr = hashMatch();
       var filterID = arr[1];
       setActiveFilter(filterID);
       var checkedFilter = document.getElementById(filterID);
@@ -148,7 +154,6 @@ define([
   }
   /**
    * Вызывает функцию фильтрации на списке отелей с переданным fitlerID
-   * и подсвечивает кнопку активного фильтра.
    * @param {string} filterID
    */
   function setActiveFilter(filterID) {
@@ -227,8 +232,8 @@ define([
    */
   function initFilters() {
     var filtersContainer = document.querySelector('.filters');
-    if (location.hash.match(/^#filters\/(\S+)$/)) {
-      var arr = location.hash.match(/^#filters\/(\S+)$/);
+    if (hashMatch()) {
+      var arr = hashMatch();
       var filterID = arr[1];
     }
     var filterChecked = document.querySelector('#' + filterID) ||
@@ -241,6 +246,8 @@ define([
       }
     });
   }
+
+  window.addEventListener('hashchange', parseURL());
 
   photosCollection.fetch({ timeout: REQUEST_FAILURE_TIMEOUT }).success(function(loaded, state, jqXHR) {
     initiallyLoaded = jqXHR.responseJSON;

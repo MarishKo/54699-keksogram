@@ -44,7 +44,6 @@ define(function() {
       this._newElement.querySelector('.picture-likes').textContent = this.model.get('likes');
 
       this.el.classList.add('picture');
-
       if (this.model.get('url')) {
         this._pictureBackground = new Image(182, 182);
 
@@ -57,6 +56,13 @@ define(function() {
 
         this._pictureBackground.src = this.model.get('url');
       }
+      if (this.model.get('preview')) {
+        this._pictureBackground.addEventListener('load', this._onImageLoad);
+        this._pictureBackground.addEventListener('error', this._onImageFail);
+        this._pictureBackground.src = this.model.get('preview');
+      }
+
+
     },
 
     /**

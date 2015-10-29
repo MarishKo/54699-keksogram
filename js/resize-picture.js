@@ -31,8 +31,7 @@ define(function() {
       var side = Math.min(
           this._container.width * INITIAL_SIDE_RATIO,
           this._container.height * INITIAL_SIDE_RATIO);
-      // Изначально предлагаемое кадрирование — часть по центру с размером в 3/4
-      // от размера меньшей стороны.
+      // Изначально предлагаемое кадрирование
       this._resizeConstraint = new Square(
           this._container.width / 2 - side / 2,
           this._container.height / 2 - side / 2,
@@ -293,8 +292,6 @@ define(function() {
       return imageToExport;
     }
   };
-
-
 
   /**
    * Вспомогательный тип, описывающий квадрат.

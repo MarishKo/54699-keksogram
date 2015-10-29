@@ -77,9 +77,7 @@ define(function() {
     uploadForm.classList.remove('invisible');
   };
   if (sideIsValid() && displacementIsValid()) {
-    window.addEventListener('resizerchange', function() {
-      //resizer.moveConstraint(parseInt(resizeX.value, 10), parseInt(resizeY.value, 10), parseInt(resizeSize.value, 10));
-    });
+    window.addEventListener('resizerchange', function() {});
   }
   resizeForm.onsubmit = function(evt) {
     evt.preventDefault();
