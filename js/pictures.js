@@ -141,11 +141,12 @@ define([
    *запускает фильтрацию с аргументом находящимся в хэше после filters/
    */
   function parseURL() {
-    if (!hashMatch()) {
+    var hashCompare = hashMatch();
+    if (!hashCompare) {
       setActiveFilter('filter-popular');
     }
-    if (hashMatch()) {
-      var arr = hashMatch();
+    if (hashCompare) {
+      var arr = hashCompare;
       var filterID = arr[1];
       setActiveFilter(filterID);
       var checkedFilter = document.getElementById(filterID);

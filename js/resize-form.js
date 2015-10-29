@@ -76,9 +76,7 @@ define(function() {
     resizeForm.classList.add('invisible');
     uploadForm.classList.remove('invisible');
   };
-  if (sideIsValid() && displacementIsValid()) {
-    window.addEventListener('resizerchange', function() {});
-  }
+
   resizeForm.onsubmit = function(evt) {
     evt.preventDefault();
     if (sideIsValid() && displacementIsValid()) {
