@@ -2,6 +2,9 @@
 
 define(function() {
   var GalleryPicture = Backbone.View.extend({
+    /**
+     * @override
+     */
     initialize: function() {
       // Фиксирование контекста обработчика клика по лайку.
       this._onButtonClick = this._onButtonClick.bind(this);
@@ -11,7 +14,10 @@ define(function() {
         this._updateLikeButton();
       }.bind(this));
     },
-
+    /**
+     * Отрисовка вьюхи для видео
+     * @override
+     */
     render: function() {
       var videoElement = this.el.querySelector('.video');
       var imgElement = this.el.querySelector('.gallery-overlay-image');
@@ -33,18 +39,24 @@ define(function() {
       // показывающего сердечко.
       this._updateLikeButton();
     },
-
+    /**
+     * удаление обработчика событий
+     */
     remove: function() {
       this._likeButton.removeEventListener('click', this._onButtonClick);
     },
-
+    /**
+     * @private
+     */
     _updateLikeButton: function() {
       if (this._likeButton) {
         this._likeButton.classList.toggle('likes-count-liked', this.model.get('liked'));
         this._likeButton.innerHTML = this.model.get('likes');
       }
     },
-
+    /**
+     * @private
+     */
     _onButtonClick: function() {
       var isLiked = this._likeButton.classList.contains('likes-count-liked');
       if (isLiked) {
